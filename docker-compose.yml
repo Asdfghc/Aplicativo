@@ -1,0 +1,19 @@
+services:
+  oracle-db:
+    image: gvenzl/oracle-free:slim-faststart
+    container_name: oracle-free
+    environment:
+      ORACLE_PASSWORD: senha
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+
+  express-app:
+    build: .
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - oracle-db
