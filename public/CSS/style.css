@@ -1,0 +1,45 @@
+:root{
+    --base-color: white;
+    --base-variante: #e8e9ed;
+    --text-color: black;
+    --secondery-text: black;
+    --primary-color: #3a435d;
+    --accent-color: #0071ff;
+
+}
+
+.darkmode{
+
+    --base-color: black;
+    --base-variante: #33334d;
+    --text-color: white;
+    --secondery-text: white;
+    --primary-coloro: #3a435d;
+    --accent-color: #0071ff;
+
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    min-height: 100vh;
+    background-color: var(--base-color);
+    color: var(--text-color);
+}
+
+#theme-switch{ 
+
+    height: 50px;
+    width: 50px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--base-variante);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 20px;
+    right: 20px;
+}
