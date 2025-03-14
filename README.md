@@ -18,3 +18,8 @@ Inicie o container no docker (precisa do docker)
 ```sh
 docker-compose up -d --build
 ```
+para rodar o tailwind, abra un novo terminal no vscode e digite 
+```sh
+ npx @tailwindcss/cli -i ./public/CSS/style.css -o ./public/CSS/output.css --watch
+```
+
