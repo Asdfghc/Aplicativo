@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon app.js",
     "start": "node app.js",
-    "migrate": "node migration-runner.js",
-    "rollback": "node rollback-runner.js"
+    "devStart": "nodemon app.js",
+    "migrate": "node migrations/migration-runner.js migrate",
+    "rollback": "node migrations/migration-runner.js rollback"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.0.13",
