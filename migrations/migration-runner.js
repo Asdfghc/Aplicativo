@@ -40,7 +40,7 @@ async function run(action) {
                     await connection.execute(sql);
                     console.log(`Successfully ran ${action}: ${file}`);
                 } catch (err) {
-                    console.error(`Error running ${action}: ${file}`);
+                    console.error(`Error running ${action}: ${file}`, err.error);
                 }
             }
         }
