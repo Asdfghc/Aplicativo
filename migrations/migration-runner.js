@@ -65,7 +65,7 @@ async function run(action) {
                     }
                     console.log(`Successfully ran: ${file}`);
                 } catch (err) {
-                    console.error(`Error running ${action}: ${file}`, err);
+                    console.error(`Error running ${action}: ${file}`, err.error);
                 }
             }
         }
