@@ -11,5 +11,10 @@ CREATE TABLE Mensagem (
     CONSTRAINT FK_Conversa_Mensagem FOREIGN KEY (ID_Conversa) REFERENCES Conversa(ID_Conversa) 
         ON DELETE CASCADE,
     CONSTRAINT FK_Usuario_Mensagem FOREIGN KEY (ID_Usuario) REFERENCES Usuario(ID_Usuario) 
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CHECK (Conteudo IS NOT NULL AND Conteudo <> '' AND LENGTH(Conteudo) <= 500),
+    CHECK (ID_Conversa IS NOT NULL AND ID_Conversa > 0),
+    CHECK (ID_Usuario IS NOT NULL AND ID_Usuario > 0)
 )
+-- TODO: Add trigger to Updated_at
+;

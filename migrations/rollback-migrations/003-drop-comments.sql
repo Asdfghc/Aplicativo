@@ -1,2 +1,2 @@
 -- 003-drop-comments.sql
-DROP TABLE Comentarios
+DROP TABLE Comentario

@@ -6,6 +6,7 @@
     "start": "node app.js",
     "devStart": "nodemon app.js",
     "migrate": "node migrations/migration-runner.js migrate",
+    "users": "node migrations/migration-runner.js users",
     "rollback": "node migrations/migration-runner.js rollback"
   },
   "dependencies": {

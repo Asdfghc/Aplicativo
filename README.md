@@ -25,6 +25,8 @@ Para rodar o tailwind, abra um novo terminal no vscode e digite
 ```
 
 
+--Criar o usuário do banco de dados
+```npm run users```
 
 --Fazer migrations
 ```npm run migrate```

@@ -8,8 +8,10 @@ CREATE TABLE Usuario (
     Created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ID_Usuario),
-    CHECK (CPF IS NOT NULL AND LENGTH(CPF) = 11), -- CPF deve ter 11 dígitos
+    CHECK (CPF IS NOT NULL AND LENGTH(CPF) = 11), -- CPF deve ter 11 dígitos e ter apenas números -- TODO: Validar CPF
     CHECK (Email IS NOT NULL AND LENGTH(Email) > 0), -- Email não pode ser vazio
     CHECK (Nome IS NOT NULL AND LENGTH(Nome) > 0), -- Nome não pode ser vazio
     CHECK (Senha IS NOT NULL AND LENGTH(Senha) > 0) -- Senha não pode ser vazia
 )
+-- TODO: Add trigger to Updated_at
+;

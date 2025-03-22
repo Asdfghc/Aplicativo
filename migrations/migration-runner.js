@@ -5,21 +5,37 @@ const oracledb = require('oracledb');
 // Directory where migration and rollback SQL files are stored
 const migrationsDir = path.join(__dirname, 'make-migrations');
 const rollbacksDir = path.join(__dirname, 'rollback-migrations');
+const usersMigrationsDir = path.join(__dirname, 'make-users');
 
 // Check if we are doing a rollback or a migration
-const action = process.argv[2];  // Pass 'migrate' or 'rollback' as an argument
+const action = process.argv[2];  // Pass 'migrate', 'rollback', or 'users' as an argument
 
 async function run(action) {
     let connection;
 
     try {
-        connection = await oracledb.getConnection({
-            user: 'admin',
-            password: 'admin',
-            connectString: 'localhost:1521/FREE'
-        });
+        if (action === 'users') {
+            // Connect as system user to run user-specific migrations
+            connection = await oracledb.getConnection({
+                user: 'system',
+                password: 'senha',  // Use the correct password for the system user
+                connectString: 'localhost:1521/FREE'
+            });
 
-        const dir = action === 'rollback' ? rollbacksDir : migrationsDir;
+            // Use the users migration folder
+            var dir = usersMigrationsDir;
+        } else {
+            // Connect as admin user for normal migrations or rollbacks
+            connection = await oracledb.getConnection({
+                user: 'admin',
+                password: 'admin',  // Default admin user and password
+                connectString: 'localhost:1521/FREE'
+            });
+
+            // Use the default migration or rollback folder
+            var dir = action === 'rollback' ? rollbacksDir : migrationsDir;
+        }
+
         const files = fs.readdirSync(dir);
 
         // Sort in reverse order for rollbacks
@@ -37,10 +53,19 @@ async function run(action) {
 
                 console.log(`Running ${action}: ${file}`);
                 try {
-                    await connection.execute(sql);
-                    console.log(`Successfully ran ${action}: ${file}`);
+                    // Split the SQL into individual commands
+                    const statements = sql.split(';').filter(Boolean);  // Split by semicolon and filter out empty commands
+
+                    for (let statement of statements) {
+                        statement = statement.trim();  // Remove any extra whitespace
+                        if (statement) {
+                            await connection.execute(statement);  // Execute each SQL command individually
+                            //console.log(`Executed: ${statement}`);
+                        }
+                    }
+                    console.log(`Successfully ran: ${file}`);
                 } catch (err) {
-                    console.error(`Error running ${action}: ${file}`, err.error);
+                    console.error(`Error running ${action}: ${file}`, err);
                 }
             }
         }
@@ -58,5 +83,5 @@ async function run(action) {
     }
 }
 
-// Run based on the provided action (migrate or rollback)
+// Run based on the provided action ('migrate', 'rollback', or 'users')
 run(action);
