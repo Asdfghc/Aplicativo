@@ -1,21 +1,36 @@
-let darkmode = localStorage.getItem('darkmode')
-const themeSwitch = document.getElementById('theme-switch')
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("aaaa");
 
-console.log("aaaaaaa")
+    const themeSwitch = document.getElementById('theme-switch');
+    const htmlTag = document.documentElement;
 
-const enableDarkmode = () => {
-    document.body.classList.add('darkmode')
-    localStorage.setItem('darkmode', 'active')
-}
+    if (!themeSwitch) {
+        console.error("Botão de alternância não encontrado!");
+        return;
+    }
 
-const disableDarkmode = () => {
-    document.body.classList.remove('darkmode')
-    localStorage.setItem('darkmode', null)
-}
+    let theme = localStorage.getItem('theme');
 
-if(darkmode === "active") enableDarkmode()
+    const applyTheme = (mode) => {
+        if (mode === "dark") {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            console.log("Modo escuro");
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            console.log("Modo claro");
+        }
+    };
 
-themeSwitch.addEventListener("click", () => {
-    darkmode = localStorage.getItem('darkmode')
-    darkmode !== "active" ? enableDarkmode() : disableDarkmode()
-})
+    if (theme === "dark") {
+        applyTheme("dark");
+    } else {
+        applyTheme("light");
+    }
+
+    themeSwitch.addEventListener("click", () => {
+        let theme = localStorage.getItem('theme');
+        applyTheme(theme === "dark" ? "light" : "dark");
+    });
+});
