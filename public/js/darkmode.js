@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    let theme = localStorage.getItem('theme');
+    let theme = localStorage.getItem('theme') || 'auto';
 
     const applyTheme = (mode) => {
         if (mode === "dark") {
