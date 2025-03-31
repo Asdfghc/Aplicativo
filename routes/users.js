@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/new', async (req, res) => {
-    res.render('users/new');
+    res.render('users/new', {layout: "layouts/basic"});
+});
+
+router.get('/login', async (req, res) => {
+    res.render('users/login', {layout: "layouts/basic"});
 });
 
 router.post('/', async (req, res) => {

@@ -5,16 +5,19 @@ const oracledb = require('oracledb');
 const app = express();
 const port = 3000;
 
-const expressLayouts = require('express-ejs-layouts');
-app.use(expressLayouts);
-app.set('layout', 'layouts/layout');
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+
+const expressLayouts = require('express-ejs-layouts');
+app.use(expressLayouts);
+app.set('layout', 'layouts/layout', "layout/basic");
+//app.set("layout signin", false);
+//app.set('view options', { layout: false });
+
 
 async function initializeOracle() {
   try {
