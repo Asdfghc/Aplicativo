@@ -1,71 +1,44 @@
 const fs = require('fs');
 const path = require('path');
-const oracledb = require('oracledb');
+const { getConnection } = require("../db");
 
-// Directory where migration and rollback SQL files are stored
 const migrationsDir = path.join(__dirname, 'make-migrations');
-const rollbacksDir = path.join(__dirname, 'rollback-migrations');
-const usersMigrationsDir = path.join(__dirname, 'make-users');
+const rollbacksDir = path.join(__dirname, 'rollback-migrations');  // TODO: Fazer ter como dar rollback mesmo
 
-// Check if we are doing a rollback or a migration
-const action = process.argv[2];  // Pass 'migrate', 'rollback', or 'users' as an argument
+const action = process.argv[2];  // 'migrate', 'rollback', or 'users'
 
-async function run(action) {
+async function runMigrations(action) {
     let connection;
-
     try {
-        if (action === 'users') {
-            // Connect as system user to run user-specific migrations
-            connection = await oracledb.getConnection({
-                user: 'system',
-                password: 'senha',  // Use the correct password for the system user
-                connectString: 'localhost:1521/FREE'
-            });
+        // Default admin connection
+        connection = await getConnection();
 
-            // Use the users migration folder
-            var dir = usersMigrationsDir;
-        } else {
-            // Connect as admin user for normal migrations or rollbacks
-            connection = await oracledb.getConnection({
-                user: 'admin',
-                password: 'admin',  // Default admin user and password
-                connectString: 'localhost:1521/FREE'
-            });
-
-            // Use the default migration or rollback folder
-            var dir = action === 'rollback' ? rollbacksDir : migrationsDir;
-        }
+        // Determine the correct directory
+        const dir = action === 'rollback' ? rollbacksDir
+                    : migrationsDir;
 
         const files = fs.readdirSync(dir);
-
-        // Sort in reverse order for rollbacks
         if (action === 'rollback') {
-            files.sort().reverse();
+            files.sort().reverse();  // Rollbacks should run in reverse order
         } else {
-            files.sort();  // Sort in normal order for migrations
+            files.sort();
         }
 
-        // Loop through each file and execute the SQL
         for (const file of files) {
             if (path.extname(file) === '.sql') {
                 const filePath = path.join(dir, file);
                 const sql = fs.readFileSync(filePath, 'utf8');
 
                 console.log(`Running ${action}: ${file}`);
-                try {
-                    // Split the SQL into individual commands
-                    const statements = sql.split(';').filter(Boolean);  // Split by semicolon and filter out empty commands
 
+                try {
+                    const statements = sql.split(';').filter(stmt => stmt.trim());  // Split SQL by `;`
                     for (let statement of statements) {
-                        statement = statement.trim();  // Remove any extra whitespace
-                        if (statement) {
-                            await connection.execute(statement);  // Execute each SQL command individually
-                            //console.log(`Executed: ${statement}`);
-                        }
+                        await connection.execute(statement.trim());
                     }
                     console.log(`Successfully ran: ${file}`);
                 } catch (err) {
-                    console.error(`Error running ${action}: ${file}`, err.error);
+                    console.error(`Error running ${action}: ${file}`, err.message);
                 }
             }
         }
@@ -83,5 +56,4 @@ async function run(action) {
     }
 }
 
-// Run based on the provided action ('migrate', 'rollback', or 'users')
-run(action);
+module.exports = { runMigrations };

@@ -1,6 +1,10 @@
 require('dotenv').config();
 const express = require('express');
-const oracledb = require('oracledb');
+const { initializeDb } = require("./db");
+const { initializeAdminUser } = require("./initDb");
+const { runMigrations } = require("./migrations/migration-runner");
+const dbMiddleware = require('./dbMiddleware');
+const waitForOracleDB = require('./db/waitForDb');
 
 const app = express();
 const port = 3000;
@@ -15,51 +19,37 @@ app.set('views', __dirname + '/views');
 const expressLayouts = require('express-ejs-layouts');
 app.use(expressLayouts);
 app.set('layout', 'layouts/layout', "layout/basic");
-//app.set("layout signin", false);
-//app.set('view options', { layout: false });
 
-
-async function initializeOracle() {
-  try {
-    await oracledb.createPool({
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      connectionString: process.env.DB_CONNECTION_STRING
-    });
-    console.log('Oracle DB connected');
-  } catch (err) {
-    console.error('Error connecting to Oracle DB:', err);
-  }
-}
-
-app.get('/', async (req, res) => {
-  let connection;
-  try {
-    connection = await oracledb.getConnection();
-    const result = await connection.execute('SELECT \'a!!!!!!\' FROM dual');
-    res.render('index', { title: 'Hello World!', message: result.rows[0][0] });
-  } catch (err) {
-    res.status(500).send(`Error querying database: ${err.message}`);
-  } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error('Error closing connection', err);
-      }
-    }
-  }
-});
 
 
 const userRouter = require('./routes/users');
+
+
+
+
+app.use(dbMiddleware); // Attach DB connection to each request
 app.use('/users', userRouter);
 
 
+async function initialize() {
+  try {
+    await waitForOracleDB();
+    // Step 1: Create admin user using SYSTEM
+    await initializeAdminUser();
 
+    // Step 2: Initialize database connection using ADMIN_USER
+    await initializeDb();
 
+    // Step 3: Run migrations using ADMIN_USER
+    await runMigrations();
 
-app.listen(port, async () => {
-  await initializeOracle();
-  console.log(`Express server listening on port ${port}`);
-});
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+  } catch (error) {
+      console.error("Server startup failed:", error);
+      process.exit(1);
+  }
+}
+
+initialize();

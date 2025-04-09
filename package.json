@@ -5,9 +5,9 @@
   "scripts": {
     "start": "node app.js",
     "devStart": "nodemon app.js",
-    "migrate": "node migrations/migration-runner.js migrate",
-    "users": "node migrations/migration-runner.js users",
-    "rollback": "node migrations/migration-runner.js rollback"
+    "migrate": "nodemon migrations/migration-runner.js migrate",
+    "users": "nodemon migrations/migration-runner.js users",
+    "rollback": "nodemon migrations/migration-runner.js rollback"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

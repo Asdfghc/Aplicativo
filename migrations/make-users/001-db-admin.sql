@@ -8,3 +8,7 @@ GRANT CREATE TABLE, CREATE SESSION, CREATE SEQUENCE, CREATE TRIGGER TO admin;
 
 -- Allow the user to use unlimited space on the USERS tablespace
 ALTER USER admin QUOTA UNLIMITED ON users;
+
+CREATE DATABASE LINK testdb
+
+ALTER DATABASE OPEN;
