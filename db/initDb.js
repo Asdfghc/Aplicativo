@@ -1,5 +1,5 @@
+require("dotenv").config();
 const oracledb = require("oracledb");
-const dotenv = require("dotenv").config();
 
 const ADMIN_USERNAME = process.env.DB_ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.DB_ADMIN_PASSWORD;

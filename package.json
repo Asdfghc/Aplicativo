@@ -7,7 +7,7 @@
     "start": "node app.js",
     "devStart": "nodemon --legacy-watch app.js",
     "migrate": "node migrations/migration-runner.js migrate",
-    "rollback": "node migrations/migration-runner.js rollback"
+    "drop": "node migrations/migration-runner.js drop"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { getConnection } = require("../db/db");
+const { getConnection, initializeDb } = require("../db/db");
 
 const migrationsDir = path.join(__dirname, 'make-migrations');
-const rollbacksDir = path.join(__dirname, 'drop-migrations');  // TODO: Fazer ter como dar rollback mesmo
+const rollbacksDir = path.join(__dirname, 'drop-migrations');
 
 async function runMigrations(action) {
     let connection;
@@ -12,11 +12,11 @@ async function runMigrations(action) {
         connection = await getConnection();
 
         // Determine the correct directory
-        const dir = action === 'rollback' ? rollbacksDir
+        const dir = action === 'drop' ? rollbacksDir
                     : migrationsDir;
 
         const files = fs.readdirSync(dir);
-        if (action === 'rollback') {
+        if (action === 'drop') {
             files.sort().reverse();  // Rollbacks should run in reverse order
         } else {
             files.sort();
@@ -54,7 +54,18 @@ async function runMigrations(action) {
     }
 }
 
-//runMigrations(process.argv[2])
-//    .then(() => console.log('Migration process ended.'));
+// Só executa se for chamado diretamente via terminal
+if (require.main === module) {
+    const action = process.argv[2];
+    initializeDb().then(() => {
+        return runMigrations(action);
+    }).then(() => {
+        console.log('Migration process ended.');
+        process.exit(0);
+    }).catch((err) => {
+        console.error("Failed to run migrations:", err);
+        process.exit(1);
+    });
+}
 
 module.exports = { runMigrations };

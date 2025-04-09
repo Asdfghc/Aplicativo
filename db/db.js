@@ -1,5 +1,5 @@
+require("dotenv").config();
 const oracledb = require("oracledb");
-const dotenv = require("dotenv").config();
 
 let pool;
 

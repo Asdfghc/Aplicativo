@@ -23,3 +23,11 @@ Para rodar o tailwind, abra um novo terminal no vscode e digite
 ```sh
  npx @tailwindcss/cli -i ./public/css/style.css -o ./public/css/output.css --watch
 ```
+# 
+
+- Fazer migrations
+```docker compose exec express-app npm run migrate```
+
+- Deletar migrations
+```docker compose exec express-app npm run drop```
+### * Migrations são feitas automaticamente!
