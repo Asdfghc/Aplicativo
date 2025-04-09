@@ -6,7 +6,6 @@ services:
       ORACLE_PASSWORD: senha
     ports:
       - "1521:1521"
-      - "5500:5500"
 
   express-app:
     build: .

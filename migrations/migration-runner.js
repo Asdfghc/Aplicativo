@@ -1,11 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { getConnection } = require("../db");
+const { getConnection } = require("../db/db");
 
 const migrationsDir = path.join(__dirname, 'make-migrations');
-const rollbacksDir = path.join(__dirname, 'rollback-migrations');  // TODO: Fazer ter como dar rollback mesmo
-
-const action = process.argv[2];  // 'migrate', 'rollback', or 'users'
+const rollbacksDir = path.join(__dirname, 'drop-migrations');  // TODO: Fazer ter como dar rollback mesmo
 
 async function runMigrations(action) {
     let connection;
@@ -55,5 +53,8 @@ async function runMigrations(action) {
         }
     }
 }
+
+//runMigrations(process.argv[2])
+//    .then(() => console.log('Migration process ended.'));
 
 module.exports = { runMigrations };

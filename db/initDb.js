@@ -1,8 +1,8 @@
 const oracledb = require("oracledb");
-const { getConnection } = require("./db");
+const dotenv = require("dotenv").config();
 
-const ADMIN_USERNAME = "ADMIN_USER";
-const ADMIN_PASSWORD = "admin_password";
+const ADMIN_USERNAME = process.env.DB_ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.DB_ADMIN_PASSWORD;
 
 async function initializeAdminUser() {
     let sysConnection;
@@ -10,8 +10,8 @@ async function initializeAdminUser() {
         // Step 1: Connect using SYSTEM user
         sysConnection = await oracledb.getConnection({
             user: "system", // Use SYSTEM user to create ADMIN_USER
-            password: "senha",
-            connectString: "oracle-db:1521/FREE",
+            password: process.env.DB_SYSTEM_PASSWORD,
+            connectString: process.env.DB_CONNECTION_STRING,
         });
 
         // Step 2: Check if ADMIN_USER already exists

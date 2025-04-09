@@ -2,12 +2,12 @@
   "name": "aplicativo",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node app.js",
-    "devStart": "nodemon app.js",
-    "migrate": "nodemon migrations/migration-runner.js migrate",
-    "users": "nodemon migrations/migration-runner.js users",
-    "rollback": "nodemon migrations/migration-runner.js rollback"
+    "devStart": "nodemon --legacy-watch app.js",
+    "migrate": "node migrations/migration-runner.js migrate",
+    "rollback": "node migrations/migration-runner.js rollback"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -1,13 +1,14 @@
 const oracledb = require("oracledb");
+const dotenv = require("dotenv").config();
 
 let pool;
 
 async function initializeDb() {
     try {
         pool = await oracledb.createPool({
-            user: "ADMIN_USER",  // Now using the created admin user
-            password: "admin_password",
-            connectString: "oracle-db:1521/FREE",
+            user: process.env.DB_ADMIN_PASSWORD,
+            password: process.env.DB_ADMIN_PASSWORD,
+            connectString: process.env.DB_CONNECTION_STRING,
             poolMin: 2,
             poolMax: 10,
             poolIncrement: 1,

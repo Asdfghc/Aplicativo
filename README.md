@@ -23,13 +23,3 @@ Para rodar o tailwind, abra um novo terminal no vscode e digite
 ```sh
  npx @tailwindcss/cli -i ./public/css/style.css -o ./public/css/output.css --watch
 ```
-
-
---Criar o usuário do banco de dados
-```npm run users```
-
---Fazer migrations
-```npm run migrate```
-
---Desfazer migrations
-```npm run rollback```
