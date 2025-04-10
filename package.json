@@ -1,6 +1,6 @@
 {
-  "name": "aplicativo",
-  "version": "1.0.0",
+  "name": "Aplicativo",
+  "version": "0.1.0",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
