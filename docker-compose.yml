@@ -6,13 +6,13 @@ services:
       ORACLE_PASSWORD: senha
     ports:
       - "1521:1521"
-      - "5500:5500"
 
   express-app:
     build: .
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules  # Prevent overwriting node_modules
     ports:
       - "3000:3000"
     depends_on:
