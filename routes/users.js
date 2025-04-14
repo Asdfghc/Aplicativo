@@ -1,6 +1,7 @@
 const express = require("express");
-const router = express.Router();
+const passport = require("passport");
 const bcrypt = require("bcrypt");
+const router = express.Router();
 
 router.get("/new", async (req, res) => {
     res.render("users/new", { layout: "layouts/basic" });
@@ -14,7 +15,7 @@ router.get("/", async (req, res) => {
     try {
         const result = await req.db.execute("SELECT * FROM Usuario");
         console.log("result: ", result);
-        res.render("index", { message: result.rows, layout: "layouts/basic" });
+        res.render("index", { message: result.rows });
     } catch (err) {
         console.error("Error fetching users:", err);
         res.status(500).send("Error fetching users");
@@ -40,36 +41,27 @@ router.post("/new", async (req, res) => {
     }
 });
 
-router.post("/login", async (req, res) => {
-    let { email, password } = req.body;
-    console.log("body: ", req.body);
-    try {
-        const result = await req.db.execute(
-            "SELECT * FROM Usuario WHERE Email = :email",
-            [email]
-        );
+router.post("/login",
+    passport.authenticate("local", {
+        successRedirect: "/users/dashboard",
+        failureRedirect: "/users/login",
+    })
+);
 
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: "Invalid email or password" });
-        }
-
-        console.log("password: ", password);
-        const user = result.rows[0];
-        console.log("user: ", user);
-        console.log("stored password: ", user[4]);
-        const isMatch = await bcrypt.compare(password, user[4]);
-
-        if (!isMatch) {
-            return res.status(401).json({ error: "Invalid email or password" });
-        }
-
-        //req.session.userId = user.ID; // Store user ID in session
-        res.status(200).json({ message: "Login successful" });
-    } catch (error) {
-        console.error("Error during login:", error);
-        res.status(500).json({ error: "Database query failed" });
-    }
+router.get("/dashboard", checkAuthenticated, (req, res) => {
+    res.send(`Bem-vindo, ${req.user.nome}`);
 });
+
+router.post("/logout", (req, res) => {
+    req.logout(() => {
+        res.redirect("/users/login");
+    });
+});
+
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) return next();
+    res.redirect("/users/login");
+}
 
 /*
 // Teste de rotas

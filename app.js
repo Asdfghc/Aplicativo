@@ -23,6 +23,19 @@ app.set("layout", "layouts/layout", "layout/basic");
 const userRouter = require("./routes/users");
 
 app.use(dbMiddleware); // Attach DB connection to each request
+
+
+const session = require('express-session');
+const passport = require('passport');
+const initializePassport = require('./passport-config');
+
+initializePassport(passport);
+
+app.use(express.urlencoded({ extended: false }));
+app.use(session({ secret: 'segredo', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/users", userRouter);
 
 async function initialize() {
@@ -31,6 +44,7 @@ async function initialize() {
         await initializeAdminUser();
         await initializeDb();
         await runMigrations();
+
 
         app.listen(port, () => {
             console.log(`Server running on http://localhost:${port}`);
