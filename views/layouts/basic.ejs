@@ -13,6 +13,16 @@
         <button id="theme-switch" class="rounded-2xl m-4 h-8 w-15 bg-green-500 hover:bg-zinc-700"></button>    
     </div>
 
+    <br>
+    <% if (messages.error) { %>
+        <div class="alert alert-danger"><%= messages.error[0] %></div>
+    <% } %>
+
+    <% if (messages.success) { %>
+        <div class="alert alert-success"><%= messages.success[0] %></div>
+    <% } %>
+    <br>
+
     <div class="fixed flex pb-40 items-center justify-center h-screen w-screen text-gray-900 dark:text-neutral-300">
         <%- body %>
     </div>

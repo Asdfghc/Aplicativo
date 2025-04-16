@@ -28,15 +28,22 @@ app.use(dbMiddleware); // Attach DB connection to each request
 const session = require('express-session');
 const passport = require('passport');
 const initializePassport = require('./passport-config');
+const flash = require("express-flash");
 
 initializePassport(passport);
 
 app.use(express.urlencoded({ extended: false }));
-app.use(session({ secret: 'segredo', resave: false, saveUninitialized: false }));
+app.use(session({ secret: 'segredo', resave: false, saveUninitialized: false })); // TODO: trocar o segredo
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(flash());
+
 app.use("/users", userRouter);
+
+app.get("/", (req, res) => {
+    res.render("index", { message: "PAGINA PRINCIPAL!" });
+});
 
 async function initialize() {
     try {
