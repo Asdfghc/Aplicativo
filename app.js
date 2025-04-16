@@ -5,6 +5,8 @@ const { initializeAdminUser } = require("./db/initDb");
 const { runMigrations } = require("./migrations/migration-runner");
 const dbMiddleware = require("./db/dbMiddleware");
 const waitForOracleDB = require("./db/waitForDb");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const port = process.env.PORT;
@@ -20,26 +22,34 @@ const expressLayouts = require("express-ejs-layouts");
 app.use(expressLayouts);
 app.set("layout", "layouts/layout", "layout/basic");
 
-const userRouter = require("./routes/users");
-
 app.use(dbMiddleware); // Attach DB connection to each request
 
-
-const session = require('express-session');
-const passport = require('passport');
-const initializePassport = require('./passport-config');
+const session = require("express-session");
+const passport = require("passport");
+const initializePassport = require("./passport-config");
 const flash = require("express-flash");
 
 initializePassport(passport);
 
 app.use(express.urlencoded({ extended: false }));
-app.use(session({ secret: 'segredo', resave: false, saveUninitialized: false })); // TODO: trocar o segredo
+app.use(
+    session({ secret: "segredo", resave: false, saveUninitialized: false })
+); // TODO: trocar o segredo
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
 
+const server = http.createServer(app);
+const io = new Server(server);
+
+// User route
+const userRouter = require("./routes/users");
 app.use("/users", userRouter);
+
+// Chat route
+const chatRouter = require("./routes/chat");
+app.use("/chat", chatRouter);
 
 app.get("/", (req, res) => {
     res.render("index", { message: "PAGINA PRINCIPAL!" });
@@ -52,14 +62,37 @@ async function initialize() {
         await initializeDb();
         await runMigrations();
 
-
-        app.listen(port, () => {
+        server.listen(port, () => {
             console.log(`Server running on http://localhost:${port}`);
         });
     } catch (error) {
         console.error("Server startup failed:", error);
         process.exit(1);
     }
+
+    // Socket.io
+    io.on("connection", (socket) => {
+        console.log("Novo socket:", socket.id);
+
+        socket.on("joinRoom", (roomId) => {
+            socket.join(roomId);
+            console.log(`Socket ${socket.id} entrou na sala ${roomId}`);
+        });
+
+        socket.on("chatMessage", ({ roomId, senderId, message }) => {
+            io.to(roomId).emit("chatMessage", {
+                senderId,
+                message,
+                timestamp: new Date().toISOString(),
+            });
+
+            // aqui daria pra salvar no banco
+        });
+
+        socket.on("disconnect", () => {
+            console.log("Socket desconectado:", socket.id);
+        });
+    });
 }
 
 initialize();

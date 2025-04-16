@@ -1,0 +1,50 @@
+<h2 class="text-2xl font-semibold mb-4">Chat da sala <%= roomId %></h2>
+
+<ul id="messages" class="mb-4 w-full max-w-md space-y-2"></ul>
+
+<div class="flex space-x-2 w-full max-w-md">
+    <input id="messageInput" placeholder="Digite sua mensagem"
+        class="flex-1 p-2 border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-700"
+    />
+    <button id="sendBtn"
+        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    >Enviar</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const socket = io();
+        const roomId = "<%= roomId %>";
+        const userId = "<%= user.id %>";
+
+        socket.emit("joinRoom", roomId);
+
+        socket.on("chatMessage", (msg) => {
+            const li = document.createElement("li");
+            li.textContent = `${msg.senderId}: ${msg.message}`;
+            document.getElementById("messages").appendChild(li);
+        });
+
+        document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+        document.getElementById("messageInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const message = input.value.trim();
+            if (message !== "") {
+                socket.emit("chatMessage", {
+                    roomId,
+                    senderId: userId,
+                    message,
+                });
+                input.value = "";
+            }
+        }
+    });
+</script>
