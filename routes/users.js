@@ -23,6 +23,10 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/self", checkAuthenticated, async (req, res) => {
+        res.redirect("/users/"+ req.user.id);
+});
+
 router.post("/new", async (req, res) => {
     let { name, email, CPF, password } = req.body;
 
