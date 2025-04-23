@@ -15,6 +15,7 @@ async function initializeDb() {
         });
 
         console.log("OracleDB Connection Pool Created with ADMIN_USER");
+        return await pool.getConnection();
     } catch (error) {
         console.error("Database Initialization Failed:", error);
         process.exit(1);

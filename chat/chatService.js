@@ -1,4 +1,6 @@
 const { withDb } = require("../db/db");
+const oracledb = require("oracledb");
+
 
 async function getOrCreateConversa(userId1, userId2) {
     return await withDb(async (connection) => {
@@ -6,7 +8,7 @@ async function getOrCreateConversa(userId1, userId2) {
             `SELECT ID_Conversa FROM Conversa 
              WHERE (ID_Usuario1 = :u1 AND ID_Usuario2 = :u2) 
                 OR (ID_Usuario1 = :u2 AND ID_Usuario2 = :u1)`,
-            [userId1, userId2]
+            { u1: userId1, u2: userId2 }
         );
 
         if (check.rows.length > 0) {
@@ -16,11 +18,7 @@ async function getOrCreateConversa(userId1, userId2) {
         const result = await connection.execute(
             `INSERT INTO Conversa (ID_Usuario1, ID_Usuario2)
              VALUES (:u1, :u2) RETURNING ID_Conversa INTO :id`,
-            {
-                u1: userId1,
-                u2: userId2,
-                id: { dir: connection.BIND_OUT, type: connection.NUMBER }
-            }
+            { u1: userId1, u2: userId2, id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER } }
         );
 
         await connection.commit();
@@ -56,5 +54,5 @@ async function getMensagens(conversaId) {
 module.exports = {
     getOrCreateConversa,
     saveMensagem,
-    getMensagens
+    getMensagens,
 };

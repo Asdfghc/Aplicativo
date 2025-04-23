@@ -6,7 +6,7 @@ router.get("/", (req, res) => {
 });
 
 // Página do chat (simulação de conversa entre 2 usuários)
-router.get("/:roomId", (req, res) => {
+router.get("/:roomId", checkAuthenticated, (req, res) => {
     const roomId = req.params.roomId;
     const user = req.user;
     //const user = {1};

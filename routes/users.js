@@ -2,6 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const router = express.Router();
+const { getOrCreateConversa } = require("../chat/chatService");
 
 router.get("/new", async (req, res) => {
     res.render("users/new", { layout: "layouts/basic" });
@@ -67,15 +68,39 @@ router.post("/new", async (req, res) => {
 
 router.post("/login",
     passport.authenticate("local", {
-        successRedirect: "/users/dashboard",
+        successRedirect: "/",
         failureRedirect: "/users/login",
         successFlash: "Login realizado com sucesso!",
         failureFlash: "Email ou senha inválidos"
     })
 );
 
-router.get("/dashboard", checkAuthenticated, (req, res) => {
-    res.send(`Bem-vindo, ${req.user.nome}`);
+router.get("/:userId", (req, res) => {
+    const userId = req.params.userId;
+    var dono = false;
+    if (req.isAuthenticated()) {
+        if (userId == req.user.id) {
+            dono = true;
+        }
+    }
+
+    res.render("users/user", { userId, dono });
+});
+
+router.post("/:userId", checkAuthenticated, async (req, res) => {
+    const user1Id = req.params.userId;
+    const user2Id = req.user.id;
+
+    try {
+        await getOrCreateConversa(user1Id, user2Id);
+        
+        req.flash("success", "Conversa criada com sucesso!");
+        res.redirect("/chat");
+    } catch (error) {
+        console.error("Error creating conversation:", error);
+        req.flash("error", "Erro ao criar conversa. Tente novamente.");
+        res.redirect("/users/" + user1Id);
+    }
 });
 
 router.post("/logout", (req, res) => {
@@ -87,6 +112,7 @@ router.post("/logout", (req, res) => {
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();
+    req.flash("error", "Você precisa estar logado para acessar essa página.");
     res.redirect("/users/login");
 } //TODO: mover para middleware
 
