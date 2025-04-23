@@ -88,7 +88,7 @@ router.post("/logout", (req, res) => {
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();
     res.redirect("/users/login");
-}
+} //TODO: mover para middleware
 
 /*
 // Teste de rotas

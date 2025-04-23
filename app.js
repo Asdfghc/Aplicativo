@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { initializeDb } = require("./db/db");
+const { initializeDb, withDb } = require("./db/db");
 const { initializeAdminUser } = require("./db/initDb");
 const { runMigrations } = require("./migrations/migration-runner");
 const dbMiddleware = require("./db/dbMiddleware");
@@ -86,7 +86,19 @@ async function initialize() {
                 timestamp: new Date().toISOString(),
             });
 
-            // aqui daria pra salvar no banco
+            try {
+                withDb(async (connection) => {
+                    console.log(message, roomId, senderId);
+                    const result = await connection.execute(
+                        `INSERT INTO Mensagem (Conteudo, ID_Conversa, ID_Usuario)
+                        VALUES (:message, :roomId, :senderId)`,
+                        [message, roomId, senderId]
+                    );
+                    await connection.commit();
+                });
+            } catch (error) {
+                console.error("Error saving message:", error);
+            }
         });
 
         socket.on("disconnect", () => {

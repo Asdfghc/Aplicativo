@@ -39,7 +39,8 @@ async function withDb(callback) {
         const result = await callback(connection);
         return result;
     } catch (err) {
-        throw err;
+        console.error("Error in withDb:", err);
+        throw err; // Re-throw the error to be handled by the caller
     } finally {
         if (connection) {
             try {
