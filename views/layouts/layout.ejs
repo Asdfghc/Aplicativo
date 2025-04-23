@@ -14,7 +14,7 @@
                 <img src="/public/src/logo.png" class="m-2 w-16 h-16"/>
             </div>
             <h1 class="text-3xl font-bold text-gray-500">PawFinder</h1>
-            <div class="flex items-center  h-10 w-120  bg-slate-400 dark:bg-slate-800 rounded-full   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  hover:ring-2 ring-slate-700 dark:ring-slate-200 focus-within:ring-2  focus-within:ring-slate-700 dark:focus-within:ring-slate-200">
+            <div class="flex items-center  h-10 w-120  bg-slate-400 dark:bg-slate-800 rounded-full   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  hover:bg-slate-500 dark:hover:bg-slate-700 focus-within:ring-2  focus-within:ring-slate-700 dark:focus-within:ring-slate-200">
                 <svg xmlns="http://www.w3.org/2000/svg" style="transform: rotate(90deg);" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-4 size-6 text-slate-900 dark:text-slate-200">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
@@ -26,11 +26,20 @@
                     >
                   </form>                                       
             </div>
+            <div class="flex justify-center h-15 w-15 mr-4 ml-auto">
+                <a href="/users/self" class="flex justify-center items-center">
+                    <button class="flex flex-col fixed rounded-full h-12 w-12 items-center justify-center hover:bg-slate-400 dark:hover:bg-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-9 text-slate-900 dark:text-slate-200">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                    </button>    
+                </a>
+            </div>
         </div>
         
         <div class="fixed border-r-1 flex justify-center w-25 h-screen border-slate-600 bg-slate-300 dark:bg-slate-900 z-2">
             <a href="/users" class=" flex justify-center">
-                <button class="flex flex-col fixed mt-8 rounded-xl h-14 w-17 items-center justify-center hover:border-2 border-slate-700 dark:border-slate-200 bg-slate-400 dark:bg-slate-800">
+                <button class="flex flex-col fixed mt-8 rounded-xl h-14 w-17 items-center justify-center hover:bg-slate-400 dark:hover:bg-slate-800">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-900 dark:text-slate-200">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                     </svg>
@@ -39,7 +48,7 @@
             </a>
     
             <a href="/chat" class="flex justify-center">
-                <button class="flex flex-col fixed mt-30 rounded-xl h-14 w-17 items-center justify-center hover:border-2 border-slate-700 dark:border-slate-200 bg-slate-400 dark:bg-slate-800">
+                <button class="flex flex-col fixed mt-30 rounded-xl h-14 w-17 items-center justify-center hover:bg-slate-400 dark:hover:bg-slate-800">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-900 dark:text-slate-200">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                       </svg>              
@@ -47,7 +56,7 @@
                 </button>
             </a>
     
-            <button id="theme-switch" class=" flex fixed bottom-10 mb-4 rounded-xl h-10 w-10 items-center justify-center hover:border-2 border-slate-700 dark:border-slate-200 bg-slate-400 dark:bg-slate-800">
+            <button id="theme-switch" class=" flex fixed bottom-10 mb-4 rounded-xl h-10 w-10 items-center justify-center hover:bg-slate-400 dark:hover:bg-slate-800">
     
                 <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-900 dark:text-slate-200">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
@@ -68,7 +77,7 @@
             <div class="alert alert-success"><%= messages.success[0] %></div>
         <% } %>
 
-        <div class="flex fixed w-screen h-screen justify-center items-center z-1">
+        <div class="flex fixed w-screen h-screen justify-center overflow-hidden items-center z-1">
             <%- body %>
         </div>
     </div>
