@@ -1,11 +1,3 @@
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lef4iErAAAAAAwEFGcKgJGKPFnr4GOFWCzKqSPf"></script>
-    <script>
-      grecaptcha.ready(() => {
-        grecaptcha.execute('6Lef4iErAAAAAAwEFGcKgJGKPFnr4GOFWCzKqSPf', { action: 'login' }).then(token => {
-
-          document.getElementById('g-recaptcha-token').value = token;
-        });
-      });
     </script>   
     <form action="/users/login" method="post"
           class="w-120 p-6 rounded-2xl bg-slate-300 dark:bg-slate-800">
