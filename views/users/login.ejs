@@ -1,12 +1,28 @@
-<script>
-    console.log("AAA")
-</script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lef4iErAAAAAAwEFGcKgJGKPFnr4GOFWCzKqSPf"></script>
+    <script>
+      grecaptcha.ready(() => {
+        grecaptcha.execute('6Lef4iErAAAAAAwEFGcKgJGKPFnr4GOFWCzKqSPf', { action: 'login' }).then(token => {
 
-<form action="/users/login" method="post" class="w-120 p-6 rounded-2xl bg-slate-300 dark:bg-slate-800">
-    <h1 class="text-center w-full mb-4 text-3xl font-bold text-gray-500">Login</h1>
-    <input type="email" name="email" placeholder="Email" class="w-full p-2 rounded-lg mb-2 bg-slate-400 dark:bg-slate-900">
-    <br>
-    <input type="password" name="password" placeholder="Senha" class="w-full p-2 rounded-lg mb-4 bg-slate-400 dark:bg-slate-900">
-    <br>
-    <button type="submit" class="block mx-auto rounded-2xl h-8 w-18 bg-green-500 hover:bg-zinc-700">Entrar</button>
-</form>
+          document.getElementById('g-recaptcha-token').value = token;
+        });
+      });
+    </script>   
+    <form action="/users/login" method="post"
+          class="w-120 p-6 rounded-2xl bg-slate-300 dark:bg-slate-800">
+    
+      <h1 class="text-center w-full mb-4 text-3xl font-bold text-gray-500">
+        Login
+      </h1>    
+      <input type="email"   name="email"    placeholder="Email"
+             class="w-full p-2 rounded-lg mb-2 bg-slate-400 dark:bg-slate-900" required>
+    
+      <input type="password" name="password" placeholder="Senha"
+             class="w-full p-2 rounded-lg mb-4 bg-slate-400 dark:bg-slate-900" required>    
+      <input type="hidden" id="g-recaptcha-token" name="g-recaptcha-token">
+    
+      <button type="submit"
+              class="block mx-auto rounded-2xl h-8 w-18 bg-green-500 hover:bg-zinc-700">
+        Entrar
+      </button>
+    </form>
+    
