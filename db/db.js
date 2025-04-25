@@ -15,6 +15,7 @@ async function initializeDb() {
         });
 
         console.log("OracleDB Connection Pool Created with ADMIN_USER");
+        return await pool.getConnection();
     } catch (error) {
         console.error("Database Initialization Failed:", error);
         process.exit(1);
@@ -39,7 +40,8 @@ async function withDb(callback) {
         const result = await callback(connection);
         return result;
     } catch (err) {
-        throw err;
+        console.error("Error in withDb:", err);
+        throw err; // Re-throw the error to be handled by the caller
     } finally {
         if (connection) {
             try {

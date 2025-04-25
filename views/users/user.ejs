@@ -1,0 +1,11 @@
+
+Pagina do <%- userId %>
+<% if (dono) { %>
+    <h1>Ah, é vc! <h1>
+<% } else { %>
+<form action="/users/<%= userId %>" method="POST" class="flex flex-col items-center justify-center">
+    <button type="submit" class="ml-4 h-10 w-10 border-2 rounded-xl border-slate-900">Chat</button>
+</form>
+<% } %>
+
+
