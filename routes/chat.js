@@ -8,10 +8,9 @@ router.get("/", (req, res) => {
 // Página do chat (simulação de conversa entre 2 usuários)
 router.get("/:roomId", checkAuthenticated, (req, res) => {
     const roomId = req.params.roomId;
-    const user = 1;
-    //const user = {1};
-    console.log(roomId, user);
-    res.render("chat/chat", { roomId, user , layout:"layouts/chats"});
+    const user = req.user;
+    
+    res.render("chat/chat", { roomId, user, layout:"layouts/chats"});
 });
 
 function checkAuthenticated(req, res, next) {

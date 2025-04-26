@@ -79,16 +79,41 @@ router.post("/login",
     })
 );
 
-router.get("/:userId", (req, res) => {
-    const userId = req.params.userId;
-    var dono = false;
-    if (req.isAuthenticated()) {
-        if (userId == req.user.id) {
-            dono = true;
-        }
-    }
+router.post("/logout", (req, res) => {
+    req.flash("success", `Até mais, ${req.user.nome}!`);
+    req.logout(() => {
+        res.redirect("/");
+    });
+});
 
-    res.render("users/user", { userId, dono });
+router.get("/:userId", async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const result = await req.db.execute(
+            "SELECT * FROM Usuario WHERE ID_Usuario = :userId",
+            [userId]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            req.flash("error", "Usuário não encontrado.");
+            return res.redirect("/users");
+        }
+
+        var dono = false;
+        if (req.isAuthenticated()) {
+            dono = req.user.id == userId;
+        }
+        const username = user[3];
+
+        res.render("users/user", { username, userId, dono });
+
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        req.flash("error", "Erro ao buscar usuário. Tente novamente.");
+        res.redirect("/users");
+    }
 });
 
 router.post("/:userId", checkAuthenticated, async (req, res) => {
@@ -98,20 +123,13 @@ router.post("/:userId", checkAuthenticated, async (req, res) => {
     try {
         await getOrCreateConversa(user1Id, user2Id);
         
-        req.flash("success", "Conversa criada com sucesso!");
-        res.redirect("/chat");
+        //req.flash("success", "Conversa criada com sucesso!");
+        res.redirect("/chat"); // TODO: Redirecionar pra conversa
     } catch (error) {
         console.error("Error creating conversation:", error);
         req.flash("error", "Erro ao criar conversa. Tente novamente.");
         res.redirect("/users/" + user1Id);
     }
-});
-
-router.post("/logout", (req, res) => {
-    req.logout(() => {
-        req.flash(`success", "Até mais, ${req.user.nome}!`);
-        res.redirect("/");
-    });
 });
 
 function checkAuthenticated(req, res, next) {

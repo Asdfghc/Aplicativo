@@ -27,6 +27,7 @@ async function getOrCreateConversa(userId1, userId2) {
 }
 
 async function saveMensagem(conversaId, userId, conteudo) {
+    console.log(conversaId, userId, conteudo);
     return await withDb(async (connection) => {
         await connection.execute(
             `INSERT INTO Mensagem (Conteudo, ID_Conversa, ID_Usuario)
