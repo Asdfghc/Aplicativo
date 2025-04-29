@@ -54,8 +54,12 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/self", checkAuthenticated, async (req, res) => {
-    res.redirect("/users/" + req.user.id);
+router.get("/self", async (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.redirect("/users/login");
+    } else {
+        res.redirect("/users/" + req.user.id);
+    }
 });
 
 router.post("/new", verificaRecaptcha, async (req, res) => {
