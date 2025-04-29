@@ -12,6 +12,7 @@ const { runMigrations } = require("./migrations/migration-runner");
 const dbMiddleware = require("./db/dbMiddleware");
 const waitForOracleDB = require("./db/waitForDb");
 const initializePassport = require("./passport-config");
+const { saveMensagem, getMensagens } = require("./chat/chatService");
 
 const app = express();
 const port = process.env.PORT;
@@ -67,30 +68,34 @@ async function initialize() {
         io.on("connection", (socket) => {
             console.log("Novo socket:", socket.id);
 
-            socket.on("joinRoom", (roomId) => {
+            socket.on("joinRoom", async (roomId) => {
                 socket.join(roomId);
                 console.log(`Socket ${socket.id} entrou na sala ${roomId}`);
+
+                try {
+                    const mensagensAntigas = await getMensagens(roomId);
+                    // Envia todas mensagens antigas pro usuário que acabou de entrar
+                    socket.emit("loadMessages", mensagensAntigas);
+                } catch (err) {
+                    console.error("Erro buscando mensagens antigas:", err);
+                }
             });
 
-            socket.on("chatMessage", ({ roomId, senderId, message }) => {
+            socket.on("chatMessage", async ({ roomId, senderId, senderName, message }) => {
                 io.to(roomId).emit("chatMessage", {
                     senderId,
+                    senderName,
                     message,
                     timestamp: new Date().toISOString(),
                 });
 
                 try {
-                    withDb(async (connection) => {
-                        await connection.execute(
-                            `INSERT INTO Mensagem (Conteudo, ID_Conversa, ID_Usuario)
-               VALUES (:message, :roomId, :senderId)`,
-                            [message, roomId, senderId]
-                        );
-                        await connection.commit();
-                    });
-                } catch (error) {
-                    console.error("Error saving message:", error);
+                    console.log("Salvando mensagem:", roomId, senderId, message);
+                    await saveMensagem(roomId, senderId, message);
+                } catch (err) {
+                    console.log(`Erro salvando mensagem: ${err}`);
                 }
+                
             });
 
             socket.on("disconnect", () => {
