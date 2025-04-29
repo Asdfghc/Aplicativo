@@ -3,6 +3,7 @@ const express = require("express");
 const { initializeDb } = require("./db/db");
 const { initializeAdminUser } = require("./db/initDb");
 const { runMigrations } = require("./migrations/migration-runner");
+const { runSeeds } = require("./seeder/seed-runner");
 const dbMiddleware = require("./db/dbMiddleware");
 const waitForOracleDB = require("./db/waitForDb");
 
@@ -30,7 +31,9 @@ async function initialize() {
         await waitForOracleDB();
         await initializeAdminUser();
         await initializeDb();
+        //await runMigrations('drop');
         await runMigrations();
+        await runSeeds();
 
         app.listen(port, () => {
             console.log(`Server running on http://localhost:${port}`);

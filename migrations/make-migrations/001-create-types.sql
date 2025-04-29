@@ -1,0 +1,17 @@
+-- 001-create-types.sql
+
+CREATE OR REPLACE TYPE RoleType AS OBJECT (
+    role VARCHAR2(20)
+);
+
+CREATE OR REPLACE TYPE AccountStatusType AS OBJECT (
+    status VARCHAR2(20)
+);
+
+CREATE OR REPLACE TYPE SexType AS OBJECT (
+    sex VARCHAR2(6)
+);
+
+CREATE OR REPLACE TYPE KnownOrLostType AS OBJECT (
+    status VARCHAR2(5)
+)
