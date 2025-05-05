@@ -49,9 +49,10 @@ async function listarConversasComNomes(db, userId) {
         { userId }
     );
 
+    console.log("Conversas:", result.rows);
     const conversas = result.rows.map(row => ({
-        id: row[0],
-        outroUsuarioId: row[1]
+        id: row.ID_CONVERSA,
+        outroUsuarioId: row.OUTRO_USUARIO_ID,
     }));
 
     if (conversas.length === 0) return [];
@@ -65,7 +66,7 @@ async function listarConversasComNomes(db, userId) {
 
     const idToNome = {};
     nomeResult.rows.forEach(row => {
-        idToNome[row[0]] = row[1];
+        idToNome[row.ID_USUARIO] = row.NOME;
     });
 
     const conversasComNome = conversas.map(c => ({

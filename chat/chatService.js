@@ -12,7 +12,7 @@ async function getOrCreateConversa(userId1, userId2) {
         );
 
         if (check.rows.length > 0) {
-            return check.rows[0][0]; // ID_Conversa
+            return check.rows[0].ID_CONVERSA; // ID_Conversa
         }
 
         const result = await connection.execute(

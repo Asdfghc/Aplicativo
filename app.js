@@ -61,7 +61,7 @@ async function initialize() {
         app.use("/chat", chatRouter);
 
         app.get("/", (req, res) => {
-            res.render("index", { message: "PAGINA PRINCIPAL!" });
+            res.render("index");
         });
 
         // Socket.io

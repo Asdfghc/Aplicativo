@@ -43,17 +43,6 @@ router.get("/login", async (req, res) => {
     res.render("users/login", { layout: "layouts/basic" });
 });
 
-router.get("/", async (req, res) => {
-    try {
-        const result = await req.db.execute("SELECT * FROM Usuario");
-        console.log("result: ", result);
-        res.render("index", { message: result.rows });
-    } catch (err) {
-        console.error("Error fetching users:", err);
-        res.status(500).send("Error fetching users");
-    }
-});
-
 router.get("/self", async (req, res) => {
     if (!req.isAuthenticated()) {
         res.redirect("/users/login");
@@ -74,12 +63,7 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
     CPF = CPF.replace(/\D/g, ""); // Remove non-numeric characters from CPF
     password = await bcrypt.hash(password, 10);
     try {
-        await req.db.execute("INSERT INTO Usuario (Email, CPF, Nome, Senha) VALUES (:email, :CPF, :name, :password)", [
-            email,
-            CPF,
-            name,
-            password,
-        ]);
+        await req.db.execute("INSERT INTO Usuario (Email, CPF, Nome, Senha) VALUES (:email, :CPF, :name, :password)", [email, CPF, name, password]);
         await req.db.commit();
 
         // Pega o usuário recém-criado para logar
@@ -87,9 +71,9 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
 
         const user = result.rows[0];
         const userObj = {
-            id: user[0], // ID
-            email: user[1], // Email
-            nome: user[3], // Nome
+            id: user.ID_USUARIO,
+            email: user.EMAIL,
+            nome: user.NOME,
         };
 
         req.login(userObj, (err) => {
@@ -130,20 +114,20 @@ router.get("/:userId", async (req, res) => {
 
         if (!user) {
             req.flash("error", "Usuário não encontrado.");
-            return res.redirect("/users");
+            return res.redirect("/");
         }
 
         var dono = false;
         if (req.isAuthenticated()) {
             dono = req.user.id == userId;
         }
-        const username = user[3];
+        const username = user.NOME;
 
         res.render("users/user", { username, userId, dono });
     } catch (error) {
         console.error("Error fetching user:", error);
         req.flash("error", "Erro ao buscar usuário. Tente novamente.");
-        res.redirect("/users");
+        res.redirect("/");
     }
 });
 
@@ -152,10 +136,9 @@ router.post("/:userId", checkAuthenticated, async (req, res) => {
     const user2Id = req.user.id;
 
     try {
-        await getOrCreateConversa(user1Id, user2Id);
-
-        //req.flash("success", "Conversa criada com sucesso!");
-        res.redirect("/chat"); // TODO: Redirecionar pra conversa
+        const conversa = await getOrCreateConversa(user1Id, user2Id);
+        console.log("CONVERSA: ", conversa);
+        res.redirect("/chat/" + conversa); // TODO: Redirecionar pra conversa
     } catch (error) {
         console.error("Error creating conversation:", error);
         req.flash("error", "Erro ao criar conversa. Tente novamente.");

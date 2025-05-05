@@ -30,9 +30,9 @@ function initialize(passport) {
 
                     console.log("password: ", password);
                     console.log("user: ", user);
-                    console.log("stored password: ", user[4]); // Supondo que user[4] seja a senha
+                    console.log("stored password: ", user.SENHA);
 
-                    const isMatch = await bcrypt.compare(password, user[4]);
+                    const isMatch = await bcrypt.compare(password, user.SENHA);
 
                     if (!isMatch) {
                         console.log("Senha incorreta.");
@@ -43,9 +43,9 @@ function initialize(passport) {
 
                     // Retorne um objeto de usuário com os campos desejados
                     return done(null, {
-                        id: user[0], // Suponha que seja o ID
-                        email: user[1], // Suponha que seja o Email
-                        nome: user[3], // Exemplo: Nome do usuário
+                        id: user.ID_USUARIO,
+                        email: user.EMAIL,
+                        nome: user.NOME,
                     });
                 } catch (err) {
                     console.error("Erro durante login:", err);
@@ -71,9 +71,9 @@ function initialize(passport) {
 
                 const row = result.rows[0];
                 return {
-                    id: row[0], // ID
-                    email: row[1], // Email
-                    nome: row[3], // Nome
+                    id: row.ID_USUARIO, // ID
+                    email: row.EMAIL, // Email
+                    nome: row.NOME, // Nome
                     // Adicione mais campos se quiser
                 };
             });

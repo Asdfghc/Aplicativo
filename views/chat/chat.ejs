@@ -47,8 +47,8 @@
             messages.forEach((msg) => {
                 console.log(msg);
                 const li = document.createElement("li");
-                const sender = msg[2] === userName ? "Você" : msg[2];
-                li.textContent = `${sender}: ${msg[0]}`;
+                const sender = msg.NOME === userName ? "Você" : msg.NOME;
+                li.textContent = `${sender}: ${msg.CONTEUDO}`;
                 messagesList.appendChild(li);
             });
         });
