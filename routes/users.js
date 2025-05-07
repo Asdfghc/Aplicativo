@@ -138,7 +138,7 @@ router.post("/:userId", checkAuthenticated, async (req, res) => {
     try {
         const conversa = await getOrCreateConversa(user1Id, user2Id);
         console.log("CONVERSA: ", conversa);
-        res.redirect("/chat/" + conversa); // TODO: Redirecionar pra conversa
+        res.redirect("/chat/" + conversa);
     } catch (error) {
         console.error("Error creating conversation:", error);
         req.flash("error", "Erro ao criar conversa. Tente novamente.");

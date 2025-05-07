@@ -72,13 +72,6 @@ async function initialize() {
                 socket.join(roomId);
                 console.log(`Socket ${socket.id} entrou na sala ${roomId}`);
 
-                try {
-                    const mensagensAntigas = await getMensagens(roomId);
-                    // Envia todas mensagens antigas pro usuário que acabou de entrar
-                    socket.emit("loadMessages", mensagensAntigas);
-                } catch (err) {
-                    console.error("Erro buscando mensagens antigas:", err);
-                }
             });
 
             socket.on("chatMessage", async ({ roomId, senderId, senderName, message }) => {

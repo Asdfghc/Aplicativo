@@ -48,7 +48,12 @@ async function getMensagens(conversaId) {
              ORDER BY m.Timestamp ASC`,
             [conversaId]
         );
-        return result.rows;
+        return result.rows.map(row => ({
+            conteudo: row.CONTEUDO,
+            timestamp: row.UPDATED_AT,
+            nome: row.NOME,
+        }))
+;
     });
 }
 

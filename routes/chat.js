@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { getMensagens } = require("../chat/chatService");
 
 router.get("/", checkAuthenticated, async (req, res) => {
     try {
@@ -28,7 +29,10 @@ router.get("/:roomId", checkAuthenticated, async (req, res) => {
 
     try {
         const conversas = await listarConversasComNomes(req.db, req.user.id);
-        res.render("chat/chat", { conversas, roomId, user, layout:"layouts/chats"});
+        const mensagens = await getMensagens(roomId);
+        console.log(`CONVERSAS: ${JSON.stringify(conversas)}`);
+        const outroUsuarioNome = conversas.find(c => c.id == roomId).nome;
+        res.render("chat/chat", { conversas, mensagens, outroUsuarioNome, roomId, user, layout:"layouts/chats" });
     } catch (err) {
         console.error("Erro ao buscar conversas:", err);
         res.status(500).send("Erro interno.");
