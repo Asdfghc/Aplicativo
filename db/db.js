@@ -1,5 +1,6 @@
 // require("dotenv").config();
 const oracledb = require("oracledb");
+oracledb.outFormat = oracledb.OBJECT;
 
 let pool;
 
@@ -15,6 +16,7 @@ async function initializeDb() {
         });
 
         console.log("OracleDB Connection Pool Created with ADMIN_USER");
+        return await pool.getConnection();
     } catch (error) {
         console.error("Database Initialization Failed:", error);
         process.exit(1);
@@ -32,4 +34,25 @@ async function closeDb() {
     }
 }
 
-module.exports = { initializeDb, getConnection, closeDb };
+async function withDb(callback) {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await callback(connection);
+        return result;
+    } catch (err) {
+        console.error("Error in withDb:", err);
+        throw err; // Re-throw the error to be handled by the caller
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+                console.log("Conexão com o banco fechada (withDb).");
+            } catch (closeErr) {
+                console.error("Erro ao fechar conexão:", closeErr);
+            }
+        }
+    }
+}
+
+module.exports = { initializeDb, getConnection, closeDb, withDb };

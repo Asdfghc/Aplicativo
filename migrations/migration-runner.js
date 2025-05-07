@@ -3,7 +3,7 @@ const path = require('path');
 const { getConnection, initializeDb } = require("../db/db");
 
 const migrationsDir = path.join(__dirname, 'make-migrations');
-const rollbacksDir = path.join(__dirname, 'drop-migrations');
+const dropsDir = path.join(__dirname, 'drop-migrations');
 
 async function runMigrations(action) {
     let connection;
@@ -12,12 +12,12 @@ async function runMigrations(action) {
         connection = await getConnection();
 
         // Determine the correct directory
-        const dir = action === 'drop' ? rollbacksDir
+        const dir = action === 'drop' ? dropsDir
                     : migrationsDir;
 
         const files = fs.readdirSync(dir);
         if (action === 'drop') {
-            files.sort().reverse();  // Rollbacks should run in reverse order
+            files.sort().reverse();  // Drops should run in reverse order
         } else {
             files.sort();
         }
