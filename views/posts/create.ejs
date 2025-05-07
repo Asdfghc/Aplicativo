@@ -6,6 +6,19 @@
     <title>Criar um Post</title>
 </head>
 <body>
-    <h1>Criação de posts</h1>
+    <form action="/posts/create" method="post">
+        <h1>Novo Anúncio</h1>
+        <br>
+        <input type="text" name="description" placeholder="Descrição do animal" required>
+        <br>
+        <input type="checkbox" name="lostOrFound" id="lostOrFound" value="1">
+        <label for="lostOrFound">Preencha a caixa caso tenha encontrado o animal</label>
+        <br>
+        <input type="text" name="lastSeen" placeholder="Último local visto" required>
+        <br>
+        <input type="datetime-local" name="dateLost" value="2025-05-07T08:30" min="2020-01-01T00:00">
+        <br>
+        <button type="submit">Publicar</button>
+    </form>
 </body>
 </html>
