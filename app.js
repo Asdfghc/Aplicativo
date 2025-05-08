@@ -36,6 +36,7 @@ async function initialize() {
     try {
         await waitForOracleDB();
         await initializeAdminUser();
+        console.log("Admin user initialized");
         await initializeDb();
         //await runMigrations('drop');
         await runMigrations();

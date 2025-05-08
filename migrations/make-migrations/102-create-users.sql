@@ -1,6 +1,7 @@
 -- 102-create-users.sql
 CREATE TABLE Users (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
+    auth_id INTEGER,
     email VARCHAR2(254),
     document_number VARCHAR2(20),
     name VARCHAR2(100),
@@ -20,6 +21,7 @@ CREATE TABLE Users (
     deleted_at TIMESTAMP,
 
     CONSTRAINT users_pk PRIMARY KEY (id),
+    CONSTRAINT users_fk_auth_id FOREIGN KEY (auth_id) REFERENCES Auth (id) ON DELETE CASCADE,
     CONSTRAINT users_chk_email CHECK (email IS NOT NULL AND REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:\.[A-Za-z]{2,})*$')),
     CONSTRAINT users_chk_document_number CHECK (document_number IS NULL OR REGEXP_LIKE(document_number, '^[0-9]+$')),
     CONSTRAINT users_chk_name CHECK (name IS NOT NULL AND LENGTH(name) > 0),

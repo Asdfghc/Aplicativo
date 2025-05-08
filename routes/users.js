@@ -2,6 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const fetch = require("node-fetch");
+const oracledb = require('oracledb');
 const router = express.Router();
 const { getOrCreateConversa } = require("../chat/chatService");
 
@@ -59,21 +60,48 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
         return res.redirect("/users/new");
     }
 
-    console.log("body: ", req.body);
+    //console.log("body: ", req.body);
     CPF = CPF.replace(/\D/g, ""); // Remove non-numeric characters from CPF
     password = await bcrypt.hash(password, 10);
     try {
-        await req.db.execute("INSERT INTO Usuario (Email, CPF, Nome, Senha) VALUES (:email, :CPF, :name, :password)", [email, CPF, name, password]);
+        const result_auth = await req.db.execute(
+            `INSERT INTO Auth (username, hashed_pwd, status, role)
+             VALUES (:username, :hashed_pwd, :status, :role)
+             RETURNING id INTO :id`,
+            {
+                username: email,
+                hashed_pwd: password,
+                status: "ACTIVE",
+                role: "USER",
+                id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER } // Captura o ID
+            }
+        );
+          
+        const newId = result_auth.outBinds.id[0];
+        console.log("ID gerado:", newId);
+          
+        await req.db.execute(
+            "INSERT INTO Users (auth_id, name, email, document_number, country_code, sex, date_of_birth) VALUES (:auth_id, :name, :email, :CPF, :country_code, :sex, TO_DATE(:date_of_birth, 'YYYY-MM-DD'))",
+            {
+                auth_id: newId,
+                name,
+                email,
+                CPF,
+                country_code: "BR",
+                sex: "M",
+                date_of_birth: "2000-01-01"
+            }
+        ); // TODO: Valores reais
         await req.db.commit();
 
-        // Pega o usuário recém-criado para logar
-        const result = await req.db.execute("SELECT * FROM Usuario WHERE Email = :email", [email]);
+        // Fetch the newly created user for login
+        const result = await req.db.execute("SELECT * FROM Users WHERE email = :email", [email]);
 
         const user = result.rows[0];
         const userObj = {
-            id: user.ID_USUARIO,
+            id: user.ID,
             email: user.EMAIL,
-            nome: user.NOME,
+            nome: user.NAME,
         };
 
         req.login(userObj, (err) => {
@@ -109,7 +137,7 @@ router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const result = await req.db.execute("SELECT * FROM Usuario WHERE ID_Usuario = :userId", [userId]);
+        const result = await req.db.execute("SELECT * FROM Users WHERE id = :userId", [userId]);
         const user = result.rows[0];
 
         if (!user) {
@@ -121,7 +149,7 @@ router.get("/:userId", async (req, res) => {
         if (req.isAuthenticated()) {
             dono = req.user.id == userId;
         }
-        const username = user.NOME;
+        const username = user.NAME;
 
         res.render("users/user", { username, userId, dono });
     } catch (error) {

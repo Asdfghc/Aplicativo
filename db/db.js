@@ -1,6 +1,7 @@
 // require("dotenv").config();
 const oracledb = require("oracledb");
 oracledb.outFormat = oracledb.OBJECT;
+oracledb.fetchAsString = [oracledb.CLOB];
 
 let pool;
 
