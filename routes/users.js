@@ -78,20 +78,17 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
         );
           
         const newId = result_auth.outBinds.id[0];
-        console.log("ID gerado:", newId);
+        //console.log("ID gerado:", newId);
           
         await req.db.execute(
-            "INSERT INTO Users (auth_id, name, email, document_number, country_code, sex, date_of_birth) VALUES (:auth_id, :name, :email, :CPF, :country_code, :sex, TO_DATE(:date_of_birth, 'YYYY-MM-DD'))",
+            "INSERT INTO Users (auth_id, name, email, document_number) VALUES (:auth_id, :name, :email, :CPF)",
             {
                 auth_id: newId,
                 name,
                 email,
-                CPF,
-                country_code: "BR",
-                sex: "M",
-                date_of_birth: "2000-01-01"
+                CPF
             }
-        ); // TODO: Valores reais
+        ); // TODO: Outros campos
         await req.db.commit();
 
         // Fetch the newly created user for login
@@ -107,7 +104,7 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
         req.login(userObj, (err) => {
             if (err) return next(err);
             req.flash("success", "Usuário criado com sucesso!");
-            res.redirect("/users/dashboard");
+            res.redirect("/users/self");
         });
     } catch (error) {
         console.error("Error creating user:", error);

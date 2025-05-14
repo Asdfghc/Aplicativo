@@ -13,9 +13,9 @@ CREATE TABLE Auth (
 
     CONSTRAINT auth_pk PRIMARY KEY (id),
     CONSTRAINT auth_chk_username CHECK (username IS NOT NULL AND REGEXP_LIKE(username, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:\.[A-Za-z]{2,})*$')),
-    CONSTRAINT auth_chk_pwd CHECK (hashed_pwd IS NOT NULL AND LENGTH(hashed_pwd) > 0),
-    CONSTRAINT auth_chk_role CHECK (role IS NOT NULL AND LENGTH(role) > 0),
-    CONSTRAINT auth_chk_status CHECK (status IS NOT NULL AND LENGTH(status) > 0),
+    CONSTRAINT auth_chk_pwd CHECK (hashed_pwd IS NOT NULL AND LENGTH(TRIM(hashed_pwd)) > 0),
+    CONSTRAINT auth_chk_role CHECK (role IS NOT NULL AND LENGTH(TRIM(role)) > 0),
+    CONSTRAINT auth_chk_status CHECK (status IS NOT NULL AND LENGTH(TRIM(status)) > 0),
     -- CONSTRAINT auth_chk_last_login CHECK (last_login IS NULL OR last_login <= CURRENT_TIMESTAMP),
     -- CONSTRAINT auth_chk_created_at CHECK (updated_at IS NOT NULL AND updated_at <= CURRENT_TIMESTAMP),
     -- CONSTRAINT auth_chk_updated_at CHECK (created_at IS NOT NULL AND created_at <= CURRENT_TIMESTAMP),

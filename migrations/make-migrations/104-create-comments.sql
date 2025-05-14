@@ -19,7 +19,7 @@ CREATE TABLE Comments (
         ON DELETE SET NULL,
     CONSTRAINT comments_chk_post_id CHECK (post_id IS NOT NULL), -- Postagem_ID não pode ser nulo
     CONSTRAINT comments_chk_user_id CHECK (user_id IS NOT NULL), -- Usuario_ID não pode ser nulo
-    CONSTRAINT comments_chk_content CHECK (content IS NOT NULL AND LENGTH(content) > 0) -- Conteúdo não pode ser vazio
+    CONSTRAINT comments_chk_content CHECK (content IS NOT NULL AND LENGTH(TRIM(content)) > 0) -- Conteúdo não pode ser vazio
     -- CONSTRAINT comments_chk_created_at CHECK (updated_at IS NOT NULL AND updated_at <= CURRENT_TIMESTAMP),
     -- CONSTRAINT comments_chk_updated_at CHECK (created_at IS NOT NULL AND created_at <= CURRENT_TIMESTAMP),
     -- CONSTRAINT comments_chk_deleted_at CHECK (deleted_at IS NULL OR deleted_at <= CURRENT_TIMESTAMP),

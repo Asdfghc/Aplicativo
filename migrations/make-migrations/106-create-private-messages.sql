@@ -17,7 +17,7 @@ CREATE TABLE PrivateMessages (
     CONSTRAINT private_messages_chk_chat_id CHECK (chat_id IS NOT NULL),
     CONSTRAINT private_messages_chk_sender_user_id CHECK (sender_user_id IS NOT NULL),
     -- CONSTRAINT private_messages_chk_timestamp CHECK (timestamp IS NOT NULL AND timestamp <= CURRENT_TIMESTAMP),
-    CONSTRAINT private_messages_chk_content CHECK (content IS NOT NULL AND LENGTH(content) > 0 AND LENGTH(content) <= 500)
+    CONSTRAINT private_messages_chk_content CHECK (content IS NOT NULL AND LENGTH(TRIM(content)) > 0 AND LENGTH(TRIM(content)) <= 500)
     -- CONSTRAINT private_messages_chk_created_at CHECK (created_at IS NOT NULL AND created_at < CURRENT_TIMESTAMP),
     -- CONSTRAINT private_messages_chk_updated_at CHECK (updated_at IS NOT NULL AND updated_at < CURRENT_TIMESTAMP),
     -- CONSTRAINT private_messages_chk_deleted_at CHECK (deleted_at IS NULL OR deleted_at < CURRENT_TIMESTAMP)
