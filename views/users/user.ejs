@@ -1,11 +1,18 @@
-Pagina de <%- username %>
 <% if (dono) { %>
     <br>
-    <form action="/users/logout" method="POST" class="flex flex-col items-center justify-center">
+    <div class="flex m-10 ">
+        <h1 class="flex text-3xl font-bold justify-center">Meu Perfil</h1>
+    </div>     
+    <br> 
+    <form action="/users/logout" method="POST" class="flex items-center justify-center">
         <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Logout</button>
     </form>
 <% } else { %>
-<form action="/users/<%= userId %>" method="POST" class="flex flex-col items-center justify-center">
-    <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Chat</button>
-</form>
+    <br>
+    <div class="w-screen h-full left-5 pr-100 flex relative items-center justify-center">
+        <h1 class="text-3xl font-bold text-gray-500">Pagina de <%- username %></h1>
+    </div>
+    <form action="/users/<%= userId %>" method="POST" class="flex items-center justify-center">
+        <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Chat</button>
+    </form>
 <% } %>
