@@ -6,8 +6,13 @@
     <title>Criar um Post</title>
 </head>
 <body>
-    <form action="/posts/create" method="post">
+    <form action="/posts/create" method="post" enctype="multipart/form-data">
         <h1>Novo Anúncio</h1>
+        <br>
+        <input type="text" name="title" placeholder="Título do Anúncio" required>
+        <br>
+        <label for="image">Imagem do Animal:</label>
+        <input type="file" name="image" id="image" accept="image/*" required>
         <br>
         <input type="text" name="description" placeholder="Descrição do animal" required>
         <br>

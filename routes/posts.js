@@ -1,17 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const { DateTime } = require('luxon');
+const multer = require("multer");
+const path = require("path");
 
-// GET
+// Configuração do Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "public/uploads/"); // Pasta para armazenar as imagens
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname); // Extensão do arquivo
+        cb(null, file.fieldname + "-" + uniqueSuffix + ext); // Nome único para o arquivo
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// GET - Renderiza a página para criar a postagem
 router.get("/create", checkAuthenticated, async (req, res) => {
     res.render("posts/create", { layout: "layouts/basic" });
 });
 
-//POST
-router.post("/create", checkAuthenticated, async (req, res) => {
-    let { description, lostOrFound, lastSeen, dateLost } = req.body;
+// POST - Criação da postagem
+router.post("/create", checkAuthenticated, upload.single("image"), async (req, res) => {
+    let { title, description, lostOrFound, lastSeen, dateLost } = req.body;
 
-    if (!description || !lastSeen || !dateLost) {
+    if (!title || !description || !lastSeen || !dateLost) {
         req.flash("error", "Preencha todos os campos.");
         return res.redirect("/posts/create");
     }
@@ -20,17 +36,33 @@ router.post("/create", checkAuthenticated, async (req, res) => {
         lostOrFound = 0;
     }
 
-    // Converter a data para o formato correto
-    const formattedDateLost = DateTime.fromISO(dateLost).toFormat('yyyy-MM-dd HH:mm');
+    if (!req.file) {
+        req.flash("error", "Imagem é obrigatória.");
+        return res.redirect("/posts/create");
+    }
+
+    // Converter a data para o formato DateTime do JavaScript
+    const date = DateTime.fromISO(dateLost);
+
+    if (!date.isValid) {
+        req.flash("error", "Data inválida.");
+        return res.redirect("/posts/create");
+    }
+
+    // Upload de imagem
+    const imageName = req.file ? req.file.filename : null;
 
     try {
+        // Inserção no banco de dados
         await req.db.execute(
-            "INSERT INTO Postagem (Descricao, Achado_ou_perdido, Ultimo_local_visto, Data_quando_perdeu, ID_Usuario) VALUES (:description, :lostOrFound, :lastSeen, TO_DATE(:dateLost, 'YYYY-MM-DD HH24:MI'), :userId)",
+            "INSERT INTO Postagem (Titulo, Imagem, Descricao, Achado_ou_perdido, Ultimo_local_visto, Data_quando_perdeu, ID_Usuario) VALUES (:title, :image, :description, :lostOrFound, :lastSeen, :dateLost, :userId)",
             {
+                title: title,
+                image: imageName,
                 description: description,
                 lostOrFound: lostOrFound,
                 lastSeen: lastSeen,
-                dateLost: formattedDateLost,
+                dateLost: date.toJSDate(),  // Passando a data no formato correto para o Oracle
                 userId: req.user.id
             }
         );
@@ -44,12 +76,13 @@ router.post("/create", checkAuthenticated, async (req, res) => {
     }
 });
 
+// Middleware para verificar se o usuário está autenticado
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next(); // Usuário autenticado, prossiga para a próxima função
     }
     req.flash("error", "Você precisa estar logado para acessar esta página.");
-    res.redirect("/users/login"); // Redirecione para a página de login
+    res.redirect("/users/login"); // Redireciona para a página de login se não estiver autenticado
 }
 
 module.exports = router;
