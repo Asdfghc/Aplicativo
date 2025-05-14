@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const { initializeDb, withDb, getConnection } = require("./db/db");
 const { initializeAdminUser } = require("./db/initDb");
 const { runMigrations } = require("./migrations/migration-runner");
+const { runSeeds } = require("./seeder/seed-runner");
 const dbMiddleware = require("./db/dbMiddleware");
 const waitForOracleDB = require("./db/waitForDb");
 const initializePassport = require("./passport-config");
@@ -35,8 +36,11 @@ async function initialize() {
     try {
         await waitForOracleDB();
         await initializeAdminUser();
+        console.log("Admin user initialized");
         await initializeDb();
+        //await runMigrations('drop');
         await runMigrations();
+        await runSeeds();
 
         app.use(
             session({
