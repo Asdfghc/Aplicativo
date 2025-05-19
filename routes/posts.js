@@ -55,7 +55,7 @@ router.post("/create", checkAuthenticated, upload.single("image"), async (req, r
     try {
         // Inserção no banco de dados
         await req.db.execute(
-            "INSERT INTO Postagem (Titulo, Imagem, Descricao, Achado_ou_perdido, Ultimo_local_visto, Data_quando_perdeu, ID_Usuario) VALUES (:title, :image, :description, :lostOrFound, :lastSeen, :dateLost, :userId)",
+            "INSERT INTO Posts (title, image, description, lost_or_found, last_known_location, last_seen, user_id) VALUES (:title, :image, :description, :lostOrFound, :lastSeen, :dateLost, :userId)",
             {
                 title: title,
                 image: imageName,
