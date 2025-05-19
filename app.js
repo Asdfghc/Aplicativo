@@ -61,8 +61,10 @@ async function initialize() {
         // Rotas
         const userRouter = require("./routes/users");
         const chatRouter = require("./routes/chat");
+        const postRouter = require("./routes/posts");
         app.use("/users", userRouter);
         app.use("/chat", chatRouter);
+        app.use("/posts", postRouter);
 
         app.get("/", (req, res) => {
             res.render("index");
