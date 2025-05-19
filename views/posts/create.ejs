@@ -1,0 +1,74 @@
+<form action="/posts/create" method="post" enctype="multipart/form-data" class="flex flex-col justify-center w-120 p-6 rounded-2xl bg-slate-300 dark:bg-slate-800">
+    <h1 class="text-center w-full mb-4 text-3xl font-bold text-gray-500">Novo Post</h1>
+    <input type="text" name="title" placeholder="Título" required class="w-full p-2 rounded-lg my-2 bg-slate-400 dark:bg-slate-900">
+    <label for="image" class="font-bold text-gray-500">Imagem do Animal:</label>
+    <div class="flex flex-col items-center justify-center my-4">
+        <label for="image" class="cursor-pointer bg-slate-500 dark:bg-slate-900 text-gray-200 dark:text-gray-500 px-4 py-2 rounded-lg hover:bg-slate-700 dark:hover:bg-slate-950 transition">
+            Selecionar Imagem
+        </label>
+        <input type="file" id="image" name="image" accept="image/*" class="hidden" required>
+        <img id="imagePreview" class="max-h-48 rounded-lg hidden object-contain border border-gray-400 mt-4" />
+    </div>
+    <input type="textarea" name="description" placeholder="Descrição do animal" required class="w-full p-2 rounded-lg mb-2 bg-slate-400 dark:bg-slate-900 resize-none overflow-hidden" rows="1">
+    <div class="flex flex-col items-center justify-center my-4">
+        <div class="flex flex-col gap-4">
+            <div class="relative flex items-center gap-2">
+                <input type="radio" id="found" name="lostOrFound" value="found"
+                    class="peer cursor-pointer appearance-none w-5 h-5 rounded-sm bg-neutral-200 dark:bg-zinc-700 checked:bg-green-500 relative" />
+                <svg class="absolute w-4 h-4 text-white hidden peer-checked:block left-0.5 top-0.6 pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                <label for="found" class="font-bold text-gray-500">Eu encontrei um animal perdido</label>
+            </div>
+            <div class="relative flex items-center gap-2">
+                <input type="radio" id="lost" name="lostOrFound" value="lost"
+                    class="peer cursor-pointer appearance-none w-5 h-5 rounded-sm bg-neutral-200 dark:bg-zinc-700 checked:bg-green-500 relative" />
+                <svg class="absolute w-4 h-4 text-white hidden peer-checked:block left-0.5 top-0.6 pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                <label for="lost" class="font-bold text-gray-500">Eu perdi meu animal</label>
+            </div>
+        </div>
+    </div>
+    <input type="text" name="lastSeen" placeholder="Último local visto" required class="w-full p-2 rounded-lg my-2 bg-slate-400 dark:bg-slate-900">
+    <div class="flex flex-col items-center justify-center my-2">
+        <input type="datetime-local" name="dateLost" min="2020-01-01T00:00" class="cursor-pointer px-4 py-2 text-gray-600 rounded-lg my-2 bg-slate-400 dark:bg-slate-900">
+    </div>
+    <button type="submit" class="cursor-pointer block mx-auto rounded-2xl h-8 w-18 bg-green-500 hover:bg-zinc-700">Publicar</button>
+</form>
+<script>
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('imagePreview');
+
+    imageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+    });
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById("dateLost");
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+
+    input.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+  });
+</script>
+
