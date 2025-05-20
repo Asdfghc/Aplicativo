@@ -1,0 +1,59 @@
+<div class="min-h-screen w-full flex justify-center bg-slate-200 dark:bg-slate-900 p-4">
+    <div class="w-full max-w-4xl p-6 rounded-2xl bg-slate-300 dark:bg-slate-800 shadow-xl space-y-6">
+        <!-- Título -->
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center"><%= post.TITLE %></h1>
+
+        <!-- Imagem -->
+        <div class="w-full flex justify-center">
+            <img src="<%= "/uploads/" + post.IMAGE %>" alt="Imagem do animal" class="max-h-96 object-contain rounded-lg border border-gray-400">
+        </div>
+
+        <!-- Status -->
+        <div class="text-center">
+            <span class="inline-block px-4 py-1 rounded-full text-white font-semibold bg-green-500"> <%= post.LOST_OR_FOUND == "found" ? "Encontrado" : "Perdido" %> </span>
+            <!-- Ou -->
+            <!-- <span class="inline-block px-4 py-1 rounded-full text-white font-semibold bg-red-500">Perdido</span> -->
+        </div>
+
+        <!-- Descrição -->
+        <p class="text-lg text-gray-800 dark:text-gray-200 whitespace-pre-line"> <%= post.DESCRIPTION %> </p>
+
+        <!-- Data e Local -->
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+            <p><strong>Último local visto:</strong> <%= post.LAST_KNOWN_LOCATION %> </p>
+            <p><strong>Data:</strong> <%= post.LAST_SEEN %> </p>
+        </div>
+
+        <hr class="border-gray-400 dark:border-gray-600" />
+
+        <!-- Seção de Comentários -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Comentários</h2>
+            <div class="space-y-4">
+                <% for (let i = 0; i < comments.length; i++) { %>
+                    <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-700">
+                        <p class="text-gray-800 dark:text-gray-100"><strong><%= comments[i].USER_NAME %>:</strong> <%= comments[i].CONTENT %></p>
+                        <span class="text-xs text-gray-600 dark:text-gray-400"><%= new Date(comments[i].TIMESTAMP).toLocaleString() %></span>
+                    </div>
+                <% } %>
+                <!-- Comentário 1 -->
+                <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-700">
+                    <p class="text-gray-800 dark:text-gray-100"><strong>Maria:</strong> Vi um parecido perto do parque ontem.</p>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">19/05/2025 às 15:00</span>
+                </div>
+
+                <!-- Comentário 2 -->
+                <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-700">
+                    <p class="text-gray-800 dark:text-gray-100"><strong>João:</strong> Que bom que encontrou! 🐶</p>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">19/05/2025 às 15:45</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campo para novo comentário -->
+        <form action="<%= "/posts/" + post.ID%>" method="post" class="mt-6 space-y-2">
+            <textarea name="comment" rows="3" required placeholder="Adicionar um comentário..." class="w-full p-3 rounded-lg bg-slate-400 dark:bg-slate-900 text-gray-800 dark:text-gray-200 resize-y"></textarea>
+            <button type="submit" class="block ml-auto px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition">Comentar</button>
+        </form>
+    </div>
+</div>

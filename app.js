@@ -29,7 +29,7 @@ app.set("views", __dirname + "/views");
 
 const expressLayouts = require("express-ejs-layouts");
 app.use(expressLayouts);
-app.set("layout", "layouts/layout", "layout/basic");
+app.set("layout", "layouts/layout");
 
 // Session, passport and flash must be initialized inside async setup
 async function initialize() {
@@ -67,7 +67,7 @@ async function initialize() {
         app.use("/posts", postRouter);
 
         app.get("/", (req, res) => {
-            res.render("index");
+            res.redirect("posts");
         });
 
         // Socket.io
