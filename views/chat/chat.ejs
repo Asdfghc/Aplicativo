@@ -1,19 +1,24 @@
 <div class="w-full h-full m-4">
     <!-- Header com nome do outro usuário -->
-    <div class="fixed flex justify-center h-10 w-1/2 border-2 rounded-xl border-slate-400 bg-slate-300 dark:bg-slate-900">
+    <div class="fixed flex justify-center h-10 w-4/6 border-2 rounded-xl border-slate-400 bg-slate-300 dark:bg-slate-900">
         <h2 class="text-2xl font-bold text-gray-500"><%= outroUsuarioNome %></h2>
     </div>
 
     <!-- Lista de mensagens -->
-    <div class="fixed flex top-38 h-4/6 w-4/6 rounded-xl overflow-hidden">
-        <ul id="messages" class="m-2 w-full h-110 overflow-y-auto space-y-2 px-4 py-4 scrollbar-hide text-slate-900 dark:text-slate-200">
-            <% mensagens.forEach(msg => { %>
-                <li>
-                    <%= msg.nome === user.nome ? "Você" : msg.nome %>: <%= msg.conteudo %>
-                </li>
-            <% }) %>
-        </ul>
-    </div>
+    <ul id="messages" class=" m-2 w-4/6 h-125 overflow-y-auto space-y-2 px-4 py-4 my-10 scrollbar-hide text-slate-900 dark:text-slate-200">
+        <% mensagens.forEach(msg => { %>
+            <% const isMine = msg.nome === user.nome; %>
+            <li class="flex <%= isMine ? 'justify-end' : 'justify-start' %>">
+                <div class="<%= isMine ? 'bg-green-500 text-white' : 'bg-gray-300 text-black' %> px-4 py-2 rounded-2xl max-w-xs break-words shadow"
+                    style="width: fit-content">
+                    <p class="text-sm"><%= msg.conteudo %></p>
+                    <span class="text-xs opacity-60 block mt-1 text-right">
+                        <%= new Date(msg.timestamp).toLocaleTimeString() %>
+                    </span>
+                </div>
+            </li>
+        <% }); %>
+    </ul>
 
     <!-- Campo de envio -->
     <div class="fixed flex w-4/6 justify-center items-center bottom-6">
@@ -56,10 +61,33 @@
         });
 
         function renderMessage(msg) {
+            const isMine = msg.senderId === userId;
+
+            const outerDiv = document.createElement("div");
+            outerDiv.className = `flex ${isMine ? "justify-end" : "justify-start"}`;
+
+            const bubbleDiv = document.createElement("div");
+            bubbleDiv.className = `${isMine ? "bg-green-500 text-white" : "bg-gray-300 text-black"} px-4 py-2 rounded-2xl max-w-xs break-words shadow`;
+            bubbleDiv.style.width = "fit-content";
+
             const li = document.createElement("li");
-            const userName = msg.senderId === userId ? "Você" : msg.senderName;
-            li.textContent = `${userName}: ${msg.message}`;
-            document.getElementById("messages").appendChild(li);
+
+            const p = document.createElement("p");
+            p.className = "text-sm";
+            p.textContent = msg.message;
+
+            const span = document.createElement("span");
+            span.className = "text-xs opacity-60 block mt-1 text-right";
+            span.textContent = new Date(msg.timestamp).toLocaleTimeString();
+
+            li.appendChild(p);
+            li.appendChild(span);
+            bubbleDiv.appendChild(li);
+            outerDiv.appendChild(bubbleDiv);
+
+            document.getElementById("messages").appendChild(outerDiv);
+            const messages = document.getElementById("messages");
+            messages.scrollTop = messages.scrollHeight;
         }
 
         function sendMessage() {
@@ -74,6 +102,13 @@
                 });
                 input.value = "";
             }
+        }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const messages = document.getElementById("messages");
+        if (messages) {
+            messages.scrollTop = messages.scrollHeight;
         }
     });
 </script>
