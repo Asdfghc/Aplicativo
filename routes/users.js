@@ -147,8 +147,9 @@ router.get("/:userId", async (req, res) => {
             dono = req.user.id == userId;
         }
         const username = user.NAME;
+        const description = user.DESCRIPTION || "";
 
-        res.render("users/user", { username, userId, dono });
+        res.render("users/user", { username, userId, dono, description });
     } catch (error) {
         console.error("Error fetching user:", error);
         req.flash("error", "Erro ao buscar usuário. Tente novamente.");
@@ -170,6 +171,37 @@ router.post("/:userId", checkAuthenticated, async (req, res) => {
         res.redirect("/users/" + user1Id);
     }
 });
+
+
+
+
+router.post("/:userId/description", checkAuthenticated, async (req, res) => {
+    const userId = req.params.userId;
+    const novaDescricao = req.body.description;
+
+    if (req.user.id != userId) {
+        req.flash("error", "Você não pode editar este perfil.");
+        return res.redirect(`/users/${userId}`);
+    }
+
+    try {
+        await req.db.execute(
+            `UPDATE Users SET description = :desc WHERE id = :id`,
+            { desc: novaDescricao, id: userId }
+        );
+        await req.db.commit();
+
+        req.flash("success", "Descrição atualizada com sucesso!");
+    } catch (err) {
+        console.error("Erro ao atualizar descrição:", err);
+        req.flash("error", "Erro ao atualizar descrição.");
+    }
+
+    res.redirect(`/users/${userId}`);
+});
+
+
+
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();

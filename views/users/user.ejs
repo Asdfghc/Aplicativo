@@ -1,11 +1,43 @@
-Pagina de <%- username %>
-<% if (dono) { %>
-    <br>
-    <form action="/users/logout" method="POST" class="flex flex-col items-center justify-center">
-        <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Logout</button>
+<div class="flex h-full w-full">
+    <% if (dono) { %>
+    <div class="absolute left-10 mt-0 text-3xl font-semibold text-gray-500">
+        Meu Perfil
+    </div>
+
+    <form action="/users/<%= userId %>/description" method="POST" class="absolute top-20 left-10 mt-4 w-96">
+        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição:</label>
+        <textarea name="description" id="description" rows="4"
+          class="w-full rounded-lg border-2 border-slate-900 dark:border-slate-200 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 p-2 resize-none"
+        ><%= description %>
+        </textarea>
+        <button type="submit"
+          class="mt-2 h-10 w-32 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-slate-300 dark:hover:bg-slate-800">
+          Salvar
+        </button>
+      </form>
+
+    <%#
+    <div>
+        FOTO DE PERFIL
+    </div>
+    %>
+
+    <form action="/users/logout" method="POST" class="fixed bottom-19 right-40">
+        <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-slate-300 dark:hover:bg-slate-800">Logout</button>
     </form>
-<% } else { %>
-<form action="/users/<%= userId %>" method="POST" class="flex flex-col items-center justify-center">
-    <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Chat</button>
-</form>
-<% } %>
+    
+
+    <% } else { %>
+    <div class="absolute left-10 mt-0 text-3xl font-semibold text-gray-500">
+        Perfil de <%- username %>
+    </div>
+
+    <div class="absolute top-20 left-10 mt-4 w-96 text-gray-700 dark:text-gray-300">
+        <p><%- description || "Este usuário ainda não escreveu uma descrição." %></p>
+      </div>
+
+    <form action="/users/logout" method="POST" class="fixed bottom-19 right-40">
+        <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-slate-300 dark:hover:bg-slate-800">Chat</button>
+    </form>
+    <% } %>
+</div>
