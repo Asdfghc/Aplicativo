@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
     try {
         // Consulta para obter todas as postagens
         const posts = await req.db.execute("SELECT * FROM Posts");
-        res.render("index", { posts: posts.rows , layout: "layouts/layout-posts"});
+        res.render("index", { posts: posts.rows, layout: "layouts/layout-posts"});
     } catch (err) {
         console.error("Erro ao buscar postagens:", err);
         req.flash("error", "Erro ao buscar postagens: " + err.message);
@@ -88,6 +88,49 @@ router.post("/create", checkAuthenticated, upload.single("image"), async (req, r
     }
 });
 
+
+router.get("/search", async (req, res) => {
+    const query = req.query.q;
+    console.log("Query de busca:", query);
+    if (!query) return res.redirect("/posts");
+
+    try {
+        const result = await req.db.execute(
+            `SELECT
+                id,
+                user_id,
+                timestamp,
+                title,
+                image,
+                description,
+                last_known_location,
+                last_seen,
+                created_at,
+                updated_at,
+                deleted_at,
+                CASE
+                    WHEN LOWER(title) LIKE '%' || LOWER(:query) || '%' THEN 3
+                    WHEN LOWER(description) LIKE '%' || LOWER(:query) || '%' THEN 2
+                    WHEN LOWER(last_known_location) LIKE '%' || LOWER(:query) || '%' THEN 1
+                    ELSE 0
+                END AS relevance
+            FROM Posts
+            WHERE LOWER(title) LIKE '%' || LOWER(:query) || '%'
+                OR LOWER(description) LIKE '%' || LOWER(:query) || '%'
+                OR LOWER(last_known_location) LIKE '%' || LOWER(:query) || '%'
+            ORDER BY relevance DESC, created_at DESC`,
+            { query: query }
+        );
+
+
+        const posts = result.rows;
+        res.render("index", { posts, searchQuery: query , layout: "layouts/layout-posts"}); // ou outra view que você use
+    } catch (err) {
+        console.error("Erro na busca:", err);
+        res.status(500).send("Erro ao buscar posts");
+    }
+});
+
 router.get("/:id", async (req, res) => {
     const postId = req.params.id;
 
@@ -107,7 +150,7 @@ router.get("/:id", async (req, res) => {
             [postId]
         );
 
-        res.render("posts/post", { post: post.rows[0] , comments: comments.rows });
+        res.render("posts/post", { post: post.rows[0], comments: comments.rows });
     } catch (err) {
         console.error("Erro ao buscar postagem:", err);
         req.flash("error", "Erro ao buscar postagem: " + err.message);
