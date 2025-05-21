@@ -30,62 +30,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
-    const postId = req.params.id;
-
-    try {
-        // Consulta para obter a postagem específica
-        const post = await req.db.execute("SELECT * FROM Posts WHERE id = :postId", [postId]);
-        if (post.rows.length === 0) {
-            req.flash("error", "Postagem não encontrada.");
-            return res.redirect("/");
-        }
-        const comments = await req.db.execute(
-            `SELECT c.id, c.content, c.timestamp, u.name AS user_name
-            FROM Comments c
-            JOIN Users u ON c.user_id = u.id
-            WHERE c.post_id = :postId
-            ORDER BY c.timestamp DESC`,
-            [postId]
-        );
-
-        res.render("posts/post", { post: post.rows[0] , comments: comments.rows });
-    } catch (err) {
-        console.error("Erro ao buscar postagem:", err);
-        req.flash("error", "Erro ao buscar postagem: " + err.message);
-        res.redirect("/");
-    }
-});
-
-router.post("/:id", checkAuthenticated, async (req, res) => {
-    const postId = req.params.id;
-    const { comment } = req.body;
-
-    if (!comment) {
-        req.flash("error", "Comentário não pode ser vazio.");
-        return res.redirect(`/posts/${postId}`);
-    }
-
-    try {
-        // Inserção do comentário no banco de dados
-        await req.db.execute(
-            "INSERT INTO Comments (POST_ID, USER_ID, CONTENT) VALUES (:postId, :userId, :content)",
-            {
-                postId: postId,
-                userId: req.user.id,
-                content: comment
-            }
-        );
-        await req.db.commit();
-        req.flash("success", "Comentário adicionado com sucesso.");
-        res.redirect(`/posts/${postId}`);
-    } catch (err) {
-        console.error("Erro ao adicionar comentário:", err);
-        req.flash("error", "Erro ao adicionar comentário: " + err.message);
-        res.redirect(`/posts/${postId}`);
-    }
-});
-
 // GET - Renderiza a página para criar a postagem
 router.get("/create", checkAuthenticated, async (req, res) => {
     res.render("posts/create", { layout: "layouts/basic" });
@@ -141,6 +85,62 @@ router.post("/create", checkAuthenticated, upload.single("image"), async (req, r
         console.error("Erro ao criar postagem:", err);
         req.flash("error", "Erro ao criar postagem: " + err.message);
         res.redirect("/posts/create");
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    const postId = req.params.id;
+
+    try {
+        // Consulta para obter a postagem específica
+        const post = await req.db.execute("SELECT * FROM Posts WHERE id = :postId", [postId]);
+        if (post.rows.length === 0) {
+            req.flash("error", "Postagem não encontrada.");
+            return res.redirect("/");
+        }
+        const comments = await req.db.execute(
+            `SELECT c.id, c.content, c.timestamp, u.name AS user_name
+            FROM Comments c
+            JOIN Users u ON c.user_id = u.id
+            WHERE c.post_id = :postId
+            ORDER BY c.timestamp DESC`,
+            [postId]
+        );
+
+        res.render("posts/post", { post: post.rows[0] , comments: comments.rows });
+    } catch (err) {
+        console.error("Erro ao buscar postagem:", err);
+        req.flash("error", "Erro ao buscar postagem: " + err.message);
+        res.redirect("/");
+    }
+});
+
+router.post("/:id", checkAuthenticated, async (req, res) => {
+    const postId = req.params.id;
+    const { comment } = req.body;
+
+    if (!comment) {
+        req.flash("error", "Comentário não pode ser vazio.");
+        return res.redirect(`/posts/${postId}`);
+    }
+
+    try {
+        // Inserção do comentário no banco de dados
+        await req.db.execute(
+            "INSERT INTO Comments (POST_ID, USER_ID, CONTENT) VALUES (:postId, :userId, :content)",
+            {
+                postId: postId,
+                userId: req.user.id,
+                content: comment
+            }
+        );
+        await req.db.commit();
+        req.flash("success", "Comentário adicionado com sucesso.");
+        res.redirect(`/posts/${postId}`);
+    } catch (err) {
+        console.error("Erro ao adicionar comentário:", err);
+        req.flash("error", "Erro ao adicionar comentário: " + err.message);
+        res.redirect(`/posts/${postId}`);
     }
 });
 
