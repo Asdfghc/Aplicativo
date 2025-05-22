@@ -134,20 +134,22 @@ router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const result = await req.db.execute("SELECT * FROM Users WHERE id = :userId", [userId]);
+        const result = await req.db.execute(
+            "SELECT * FROM Users WHERE id = :userId",
+            [userId],
+            { outFormat: oracledb.OBJECT }
+        );
         const user = result.rows[0];
+
 
         if (!user) {
             req.flash("error", "Usuário não encontrado.");
             return res.redirect("/");
         }
 
-        var dono = false;
-        if (req.isAuthenticated()) {
-            dono = req.user.id == userId;
-        }
+        const dono = req.isAuthenticated() && req.user.id == userId;
         const username = user.NAME;
-        const description = user.DESCRIPTION || "";
+        const description = user.BIO || "";
 
         res.render("users/user", { username, userId, dono, description });
     } catch (error) {
@@ -156,6 +158,7 @@ router.get("/:userId", async (req, res) => {
         res.redirect("/");
     }
 });
+
 
 router.post("/:userId", checkAuthenticated, async (req, res) => {
     const user1Id = req.params.userId;
@@ -180,25 +183,32 @@ router.post("/:userId/description", checkAuthenticated, async (req, res) => {
     const novaDescricao = req.body.description;
 
     if (req.user.id != userId) {
-        req.flash("error", "Você não pode editar este perfil.");
+        req.flash("error", "Você não pode editar esse perfil.");
         return res.redirect(`/users/${userId}`);
     }
 
+    console.log("new description:", novaDescricao);
+
     try {
         await req.db.execute(
-            `UPDATE Users SET description = :desc WHERE id = :id`,
-            { desc: novaDescricao, id: userId }
+            `UPDATE Users SET bio = :bio WHERE id = :id`,
+            {
+                bio: { val: novaDescricao, type: oracledb.STRING },
+                id: userId
+            }
         );
+
         await req.db.commit();
 
-        req.flash("success", "Descrição atualizada com sucesso!");
+        req.flash("success", "Descrição atualizada.");
     } catch (err) {
-        console.error("Erro ao atualizar descrição:", err);
+        console.error("Erro ao salvar descrição:", err);
         req.flash("error", "Erro ao atualizar descrição.");
     }
 
     res.redirect(`/users/${userId}`);
 });
+ 
 
 
 
