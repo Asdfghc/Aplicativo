@@ -40,7 +40,7 @@ async function initialize() {
         //await runMigrations('drop');
         await runMigrations();
         await runSeeds();
-
+        
         app.use(
             session({
                 secret: "segredo",

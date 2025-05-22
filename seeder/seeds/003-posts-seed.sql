@@ -1,3 +1,4 @@
+
 INSERT INTO Posts (user_id, title, description, image, lost_or_found, last_known_location, last_seen, created_at, updated_at, deleted_at)
 VALUES (1, 'Postagem 1', 'Cachorro perdido, raça labrador, cor preta. Encontrado próximo ao Parque Ibirapuera.', 'image-1747232879172-698056903.jpg', 'lost', 'Parque Ibirapuera, SP', TO_DATE('2025-04-25', 'YYYY-MM-DD'), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
 

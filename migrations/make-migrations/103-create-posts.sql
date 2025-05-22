@@ -1,4 +1,7 @@
 -- 103-create-posts.sql
+
+DROP TABLE Posts CASCADE CONSTRAINTS;
+
 CREATE TABLE Posts (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     user_id INTEGER,
