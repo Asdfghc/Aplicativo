@@ -74,13 +74,19 @@
         </div>
 
         <!-- Error Msg -->
-        <% if (messages.error) { %>
-            <div class="alert alert-danger"><%= messages.error[0] %></div>
-        <% } %>
+        <div id="alertMsg" class="alert flex flex-col justify-center items-center z-20">
+            <% if (messages.error) { %>
+                <div class="fixed top-25 z-50 flex w-auto px-6 py-3 justify-center items-center rounded-lg bg-slate-300 dark:bg-slate-800 text-lg font-bold text-red-500 shadow-md">
+                    <div class="alert alert-danger"><%= messages.error[0] %></div>
+                </div>
+            <% } %>
 
-        <% if (messages.success) { %>
-            <div class="alert alert-success"><%= messages.success[0] %></div>
-        <% } %>
+            <% if (messages.success) { %>
+                <div class="fixed top-25 z-50 flex w-auto px-6 py-3 justify-center items-center rounded-lg bg-slate-400 dark:bg-slate-800 text-lg font-bold text-green-500 shadow-md">
+                    <div class="alert alert-success"><%= messages.success[0] %></div>
+                </div>
+            <% } %>
+        </div>
 
         <!-- Content -->
         <div class="fixed top-20 left-25 w-1/6 h-[calc(100vh-5rem)] overflow-y-auto z-2 pb-4 bg-slate-300 dark:bg-slate-900 overflow-hidden">
@@ -109,6 +115,20 @@
                 iconSun.classList.toggle("hidden");
             iconMoon.classList.toggle("hidden");
         });
+    </script>
+
+    <script>
+        const alert = document.getElementById('alertMsg');
+        const totalTime = 5000;
+        const pulseTime = 1000;
+
+        setTimeout(() => {
+            alert.classList.add('animate-pulse');
+        }, totalTime - pulseTime);
+
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, totalTime);
     </script>
 
     <style>
