@@ -1,4 +1,7 @@
 -- 005-create-messages.sql
+
+DROP TABLE PrivateMessages CASCADE CONSTRAINTS;
+
 CREATE TABLE PrivateMessages (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     chat_id INTEGER,

@@ -1,4 +1,7 @@
 -- 104-create-comments.sql
+
+DROP TABLE Comments CASCADE CONSTRAINTS;
+
 CREATE TABLE Comments (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     post_id INTEGER,

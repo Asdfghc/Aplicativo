@@ -1,4 +1,7 @@
 -- 102-create-users.sql
+
+DROP TABLE Users CASCADE CONSTRAINTS;
+
 CREATE TABLE Users (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     auth_id INTEGER,

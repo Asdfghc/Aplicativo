@@ -1,4 +1,7 @@
 -- 004-create-private-chat.sql
+
+DROP TABLE PrivateChats CASCADE CONSTRAINTS;
+
 CREATE TABLE PrivateChats (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     sender_user_id INTEGER,
