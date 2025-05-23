@@ -32,7 +32,12 @@ async function runMigrations(action) {
                 try {
                     const statements = sql.split(';').filter(stmt => stmt.trim());  // Split SQL by `;`
                     for (let statement of statements) {
-                        await connection.execute(statement.trim());
+                        try {
+                            await connection.execute(statement.trim());
+                        }
+                        catch (err) {
+                            console.error(`Error executing statement in ${file}:`, err.message);
+                        }
                     }
                     console.log(`Successfully ran: ${file}`);
                 } catch (err) {

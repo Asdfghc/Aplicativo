@@ -18,6 +18,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.get("/", async (req, res) => {
+    try {
+        // Consulta para obter todas as postagens
+        const posts = await req.db.execute("SELECT * FROM Posts");
+        res.render("index", { posts: posts.rows, layout: "layouts/layout-posts"});
+    } catch (err) {
+        console.error("Erro ao buscar postagens:", err);
+        req.flash("error", "Erro ao buscar postagens: " + err.message);
+        res.redirect("/");
+    }
+});
+
 // GET - Renderiza a página para criar a postagem
 router.get("/create", checkAuthenticated, async (req, res) => {
     res.render("posts/create", { layout: "layouts/basic" });
@@ -73,6 +85,105 @@ router.post("/create", checkAuthenticated, upload.single("image"), async (req, r
         console.error("Erro ao criar postagem:", err);
         req.flash("error", "Erro ao criar postagem: " + err.message);
         res.redirect("/posts/create");
+    }
+});
+
+
+router.get("/search", async (req, res) => {
+    const query = req.query.q;
+    console.log("Query de busca:", query);
+    if (!query) return res.redirect("/posts");
+
+    try {
+        const result = await req.db.execute(
+            `SELECT
+                id,
+                user_id,
+                timestamp,
+                title,
+                image,
+                description,
+                last_known_location,
+                last_seen,
+                created_at,
+                updated_at,
+                deleted_at,
+                CASE
+                    WHEN LOWER(title) LIKE '%' || LOWER(:query) || '%' THEN 3
+                    WHEN LOWER(description) LIKE '%' || LOWER(:query) || '%' THEN 2
+                    WHEN LOWER(last_known_location) LIKE '%' || LOWER(:query) || '%' THEN 1
+                    ELSE 0
+                END AS relevance
+            FROM Posts
+            WHERE LOWER(title) LIKE '%' || LOWER(:query) || '%'
+                OR LOWER(description) LIKE '%' || LOWER(:query) || '%'
+                OR LOWER(last_known_location) LIKE '%' || LOWER(:query) || '%'
+            ORDER BY relevance DESC, created_at DESC`,
+            { query: query }
+        );
+
+
+        const posts = result.rows;
+        res.render("index", { posts, searchQuery: query , layout: "layouts/layout-posts"}); // ou outra view que você use
+    } catch (err) {
+        console.error("Erro na busca:", err);
+        res.status(500).send("Erro ao buscar posts");
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    const postId = req.params.id;
+
+    try {
+        // Consulta para obter a postagem específica
+        const post = await req.db.execute("SELECT * FROM Posts WHERE id = :postId", [postId]);
+        if (post.rows.length === 0) {
+            req.flash("error", "Postagem não encontrada.");
+            return res.redirect("/");
+        }
+        const comments = await req.db.execute(
+            `SELECT c.id, c.content, c.timestamp, u.name AS user_name
+            FROM Comments c
+            JOIN Users u ON c.user_id = u.id
+            WHERE c.post_id = :postId
+            ORDER BY c.timestamp DESC`,
+            [postId]
+        );
+
+        res.render("posts/post", { post: post.rows[0], comments: comments.rows });
+    } catch (err) {
+        console.error("Erro ao buscar postagem:", err);
+        req.flash("error", "Erro ao buscar postagem: " + err.message);
+        res.redirect("/");
+    }
+});
+
+router.post("/:id", checkAuthenticated, async (req, res) => {
+    const postId = req.params.id;
+    const { comment } = req.body;
+
+    if (!comment) {
+        req.flash("error", "Comentário não pode ser vazio.");
+        return res.redirect(`/posts/${postId}`);
+    }
+
+    try {
+        // Inserção do comentário no banco de dados
+        await req.db.execute(
+            "INSERT INTO Comments (POST_ID, USER_ID, CONTENT) VALUES (:postId, :userId, :content)",
+            {
+                postId: postId,
+                userId: req.user.id,
+                content: comment
+            }
+        );
+        await req.db.commit();
+        req.flash("success", "Comentário adicionado com sucesso.");
+        res.redirect(`/posts/${postId}`);
+    } catch (err) {
+        console.error("Erro ao adicionar comentário:", err);
+        req.flash("error", "Erro ao adicionar comentário: " + err.message);
+        res.redirect(`/posts/${postId}`);
     }
 });
 
