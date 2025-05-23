@@ -22,6 +22,7 @@ CREATE TABLE Users (
 
     CONSTRAINT users_pk PRIMARY KEY (id),
     CONSTRAINT users_fk_auth_id FOREIGN KEY (auth_id) REFERENCES Auth (id) ON DELETE CASCADE,
+    CONSTRAINT users_chk_auth_id CHECK (auth_id IS NOT NULL),
     CONSTRAINT users_chk_email CHECK (email IS NOT NULL AND REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:\.[A-Za-z]{2,})*$')),
     CONSTRAINT users_chk_document_number CHECK (document_number IS NOT NULL AND REGEXP_LIKE(document_number, '^[0-9]+$')),
     CONSTRAINT users_chk_name CHECK (name IS NOT NULL AND LENGTH(TRIM(name)) > 0),
