@@ -64,6 +64,15 @@
                 </button>
             </a>
 
+            <a href="/posts/create" class="flex justify-center">
+                <button class="flex flex-col fixed mt-52 rounded-xl h-14 w-17 justify-center items-center hover:bg-slate-300 dark:hover:bg-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-900 dark:text-slate-200">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <p class="text-gray-900 dark:text-gray-200">Novo</p>
+                </button>    
+            </a>
+
             <button id="theme-switch" class="flex fixed bottom-10 mb-4 rounded-xl h-10 w-10 items-center justify-center hover:bg-slate-400 dark:hover:bg-slate-800">
                 <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-900 dark:text-slate-200">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
@@ -93,16 +102,6 @@
                     <div class="alert alert-success"><%= messages.success[0] %></div>
                 </div>
             <% } %>
-        </div>
-
-        <div class="fixed items-center items-center left-14/15 bottom-20 h-10 w-10 z-60">
-            <a href="/posts/create">
-                <button class="flex flex-col fixed rounded-full h-12 w-12 justify-center items-center hover:bg-slate-300 dark:hover:bg-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-9 text-slate-900 dark:text-slate-200">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                </button>    
-            </a>
         </div>
     </div>
 
