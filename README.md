@@ -14,6 +14,16 @@ Instale as dependencias (precisa do npm)
 npm install
 ```
 
+Instale o luxon (formatação para as datas no banco)
+```sh
+npm install luxon
+```
+
+Instale o multer (suporte para upload de imagens)
+```sh
+npm install multer
+```
+
 Inicie o container no docker (precisa do docker)
 ```sh
 docker-compose up -d --build

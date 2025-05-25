@@ -1,11 +1,241 @@
-Pagina de <%- username %>
-<% if (dono) { %>
-    <br>
-    <form action="/users/logout" method="POST" class="flex flex-col items-center justify-center">
-        <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Logout</button>
+
+<!-- Visão do perfil para o dono-->
+<div class="flex flex-col w-full pl-10 pt-6 gap-3 ml-0">
+    <% if (dono) { %>
+    <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+        Meu Perfil
+    </h1>
+
+    <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-300 pt-2 px-10">
+        Sobre Mim:
+    </h2>
+    
+    <div id="desc-view" class="w-full text-slate-700 dark:text-slate-400 px-10 max-w-5xl">
+        <p class="break-words leading-tight indent-7 whitespace-pre-line">
+            <%- description || "Você ainda não escreveu uma descrição." %>
+        </p>
+        <button type="button" onclick="toggleEdit()" class="mt-5 h-9 w-16 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-slate-300 dark:hover:bg-slate-800">
+            Editar
+        </button>
+    </div>
+
+    <!-- Edição da descrição -->
+    <form id="desc-form" action="/users/<%= userId %>/description" method="POST" class="hidden">
+        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 px-3">
+            Descrição:
+        </label>
+
+        <div class="w-full max-w-3xl px-3">
+            <textarea name="description" id="description" maxlength="250" rows="5" class="w-full rounded-lg border-2 border-slate-900 dark:border-slate-200 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 p-2 resize-none max-h-48 overflow-y-auto"><%= (description || "").trim() %></textarea>
+        </div>
+        
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <span id="charCount">0</span>/250
+        </div>
+
+        <div class="mt-2 flex gap-4">
+            <button type="submit" class="h-10 w-24 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-slate-300 dark:hover:bg-slate-800">Salvar</button>
+            <button type="button" onclick="toggleEdit()" class="h-10 w-24 border border-red-600 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 rounded-xl">Cancelar</button>
+        </div>
     </form>
-<% } else { %>
-<form action="/users/<%= userId %>" method="POST" class="flex flex-col items-center justify-center">
-    <button type="submit" class="ml-4 h-10 w-20 border-2 rounded-xl border-slate-900">Chat</button>
-</form>
-<% } %>
+
+    <!-- Postagems -->
+    <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-300 px-10 mt-8">
+        Minhas postagens:
+    </h2>
+
+    <div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-24 p-12 px-10 h-full w-full">
+        <% if (posts.length === 0) { %>
+            <p class="text-slate-700 dark:text-slate-400 col-span-full break-words leading-tight indent-7">Você não fez nenhuma postagem.</p>
+        <% } else { %>
+            <% posts.forEach((post) => { %>
+                <div class="bg-slate-300 dark:bg-slate-700 rounded-lg shadow-md flex flex-col justify-between p-4 h-70 w-full">
+                    <a href="/posts/<%= post.ID %>">
+                        <div class="flex-1">
+                            <!-- Título -->
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-400"><%= post.TITLE %></h2>
+                                <time class="tempoPost text-xs font-bold text-gray-900 dark:text-gray-400"></time>
+                            </div>
+
+                            <!-- Imagem -->
+                            <div class="flex bg-slate-400 dark:bg-gray-800 h-42 rounded mb-4 justify-center items-center">
+                                <img src="/uploads/<%= post.IMAGE %>" alt="Imagem do post" class="w-full h-full object-cover rounded" />
+                            </div>
+
+
+
+                            <!-- Local e Status -->
+                            <p class="text-xs flex items-center justify-between mb-2 text-gray-600 dark:text-gray-400 mt-4">
+                                Último local: <%= post.LAST_KNOWN_LOCATION %>
+                                <span class="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full text-white
+                                    <%= post.LOST_OR_FOUND === 'found' ? 'bg-blue-500' : 'bg-red-500' %>">
+                                    <% if (post.LOST_OR_FOUND === "found") { %>
+                                        <!-- Encontrado -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Encontrado
+                                    <% } else { %>
+                                        <!-- Perdido -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.61-1.135.987-2.02L13.41 4.607a1.25 1.25 0 00-2.196 0L4.095 18.98c-.623.885-.067 2.02.987 2.02z" />
+                                        </svg>
+                                        Perdido
+                                    <% } %>
+                                </span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <form action="/users/logout" method="POST" class="w-full px-10 mt-12 pb-8 flex justify-end">
+        <button type="submit" class="h-10 w-24 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-red-200 dark:hover:bg-red-800">
+            Sair
+        </button>
+    </form>
+
+    
+
+
+
+    <!-- Visão do perfil para um visitante -->
+
+    <% } else { %>
+    <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+        Perfil de <%- username %>
+    </h1>
+
+    <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-300 pt-2 px-10">
+        Sobre <%- username %>:
+    </h2>
+
+    <div class="w-full text-slate-700 dark:text-slate-400 px-10 max-w-5xl">
+        <p class="break-words leading-tight indent-7 whitespace-pre-line">
+            <%- description || "Este usuário ainda não escreveu uma descrição." %>
+        </p>
+    </div>
+
+    <!-- Postagems -->
+    <h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-300 px-10 mt-8">
+        Postagens de <%- username %>:
+    </h2>
+
+    <div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-24 p-12 px-10 h-full w-full">
+        <% if (posts.length === 0) { %>
+            <p class="text-slate-700 dark:text-slate-400 col-span-full break-words leading-tight indent-7"><%- username %> não fez nenhuma postagem.</p>
+        <% } else { %>
+            <% posts.forEach((post) => { %>
+                <div class="bg-slate-300 dark:bg-slate-700 rounded-lg shadow-md flex flex-col justify-between p-4 h-70 w-full">
+                    <a href="/posts/<%= post.ID %>">
+                        <div class="flex-1">
+                            <!-- Título -->
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-400"><%= post.TITLE %></h2>
+                                <time class="tempoPost text-xs font-bold text-gray-900 dark:text-gray-400"></time>
+                            </div>
+
+                            <!-- Imagem -->
+                            <div class="flex bg-slate-400 dark:bg-gray-800 h-42 rounded mb-4 justify-center items-center">
+                                <img src="/uploads/<%= post.IMAGE %>" alt="Imagem do post" class="w-full h-full object-cover rounded" />
+                            </div>
+
+                            <!-- Local e Status -->
+                            <p class="text-xs flex items-center justify-between mb-2 text-gray-600 dark:text-gray-400 mt-4">
+                                Último local: <%= post.LAST_KNOWN_LOCATION %>
+                                <span class="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full text-white
+                                    <%= post.LOST_OR_FOUND === 'found' ? 'bg-blue-500' : 'bg-red-500' %>">
+                                    <% if (post.LOST_OR_FOUND === "found") { %>
+                                        <!-- Encontrado -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Encontrado
+                                    <% } else { %>
+                                        <!-- Perdido -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.61-1.135.987-2.02L13.41 4.607a1.25 1.25 0 00-2.196 0L4.095 18.98c-.623.885-.067 2.02.987 2.02z" />
+                                        </svg>
+                                        Perdido
+                                    <% } %>
+                                </span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+    <form action="/users/<%= userId %>" method="POST" class="w-full px-10 mt-12 pb-8 flex justify-end">
+        <button type="submit" class="h-10 w-30 border-2 rounded-xl text-slate-900 dark:text-slate-200 border-slate-900 dark:border-slate-200 hover:bg-red-200 dark:hover:bg-red-800">
+            Abrir conversa
+        </button>
+    </form>
+    <% } %>
+</div>
+
+
+
+<!-- Scripts -->
+<script>
+    function tempoDesde(data) {
+        const segundos = Math.floor((new Date() - data) / 1000);
+        const intervalos = [
+            { label: "ano", seg: 31536000 },
+            { label: "mês", seg: 2592000 },
+            { label: "dia", seg: 86400 },
+            { label: "h", seg: 3600 },
+            { label: "min", seg: 60 }
+        ];
+        for (const i of intervalos) {
+            const valor = Math.floor(segundos / i.seg);
+            if (valor > 0) return `há ${valor} ${i.label}`;
+        }
+        return "Recente";
+    }
+
+    const tempos = document.querySelectorAll(".tempoPost");
+    const posts = <%- JSON.stringify(posts) %>;
+
+    for (let i = 0; i < tempos.length; i++) {
+        const dataPost = new Date(posts[i].TIMESTAMP);
+        tempos[i].textContent = tempoDesde(dataPost);
+    }
+
+    function toggleEdit() {
+    const view = document.getElementById('desc-view');
+    const form = document.getElementById('desc-form');
+
+    view.classList.toggle('hidden');
+    form.classList.toggle('hidden');
+
+
+    const textarea = document.getElementById("description");
+    const count = document.getElementById("charCount");
+
+    if (!form.classList.contains("hidden")) {
+      count.textContent = textarea.value.length;
+
+      textarea.addEventListener("input", () => {
+        count.textContent = textarea.value.length;
+      });
+    }
+  }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const textarea = document.getElementById("description");
+    const count = document.getElementById("charCount");
+
+    if (textarea && !textarea.closest("form").classList.contains("hidden")) {
+      count.textContent = textarea.value.length;
+
+      textarea.addEventListener("input", () => {
+        count.textContent = textarea.value.length;
+      });
+    }
+  });
+</script>

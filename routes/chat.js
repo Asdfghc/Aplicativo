@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { getMensagens } = require("../chat/chatService");
 
 router.get("/", checkAuthenticated, async (req, res) => {
     try {
@@ -18,7 +19,7 @@ router.get("/:roomId", checkAuthenticated, async (req, res) => {
 
     // Verifica se o usuário está na conversa
     const result = await req.db.execute(
-        `SELECT ID_CONVERSA FROM CONVERSA WHERE ID_CONVERSA = :roomId AND (ID_USUARIO1 = :userId OR ID_USUARIO2 = :userId)`,
+        `SELECT id FROM PrivateChats WHERE id = :roomId AND (sender_user_id = :userId OR receiver_user_id = :userId)`,
         { roomId, userId: user.id }
     );
     if (result.rows.length === 0) {
@@ -28,7 +29,12 @@ router.get("/:roomId", checkAuthenticated, async (req, res) => {
 
     try {
         const conversas = await listarConversasComNomes(req.db, req.user.id);
-        res.render("chat/chat", { conversas, roomId, user, layout:"layouts/chats"});
+        const mensagens = await getMensagens(roomId);
+        //console.log("CONVERSAS: ", conversas);
+        //console.log("CONVERSA: ", conversas.find(c => c.id == roomId));
+        //console.log("MENSAGENS: ", mensagens);
+        const outroUsuarioNome = conversas.find(c => c.id == roomId).nome;
+        res.render("chat/chat", { conversas, mensagens, outroUsuarioNome, roomId, user, layout:"layouts/chats" });
     } catch (err) {
         console.error("Erro ao buscar conversas:", err);
         res.status(500).send("Erro interno.");
@@ -38,42 +44,29 @@ router.get("/:roomId", checkAuthenticated, async (req, res) => {
 // TODO: Tranformar em middleware
 async function listarConversasComNomes(db, userId) {
     const result = await db.execute(
-        `SELECT 
-            c.ID_CONVERSA,
-            CASE 
-                WHEN c.ID_USUARIO1 = :userId THEN c.ID_USUARIO2
-                ELSE c.ID_USUARIO1
-            END AS outro_usuario_id
-        FROM CONVERSA c
-        WHERE c.ID_USUARIO1 = :userId OR c.ID_USUARIO2 = :userId`,
+        `
+        SELECT 
+            pc.id AS conversation_id,
+            u.id AS user_id,
+            u.name AS user_name
+        FROM PrivateChats pc
+        JOIN Users u
+            ON u.id = CASE
+                WHEN pc.sender_user_id = :userId THEN pc.receiver_user_id
+                ELSE pc.sender_user_id
+            END
+        WHERE pc.sender_user_id = :userId OR pc.receiver_user_id = :userId
+        `,
         { userId }
     );
 
     const conversas = result.rows.map(row => ({
-        id: row[0],
-        outroUsuarioId: row[1]
+        id: row.CONVERSATION_ID,
+        outroUsuarioId: row.USER_ID,
+        nome: row.USER_NAME
     }));
 
-    if (conversas.length === 0) return [];
-
-    const ids = conversas.map(c => c.outroUsuarioId);
-
-    const nomeResult = await db.execute(
-        `SELECT ID_USUARIO, NOME FROM USUARIO WHERE ID_USUARIO IN (${ids.map((_, i) => `:${i}`).join(", ")})`,
-        ids
-    );
-
-    const idToNome = {};
-    nomeResult.rows.forEach(row => {
-        idToNome[row[0]] = row[1];
-    });
-
-    const conversasComNome = conversas.map(c => ({
-        id: c.id,
-        nome: idToNome[c.outroUsuarioId] || "Desconhecido"
-    }));
-
-    return conversasComNome;
+    return conversas;
 }
 
 function checkAuthenticated(req, res, next) {

@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const { initializeDb, withDb, getConnection } = require("./db/db");
 const { initializeAdminUser } = require("./db/initDb");
 const { runMigrations } = require("./migrations/migration-runner");
+const { runSeeds } = require("./seeder/seed-runner");
 const dbMiddleware = require("./db/dbMiddleware");
 const waitForOracleDB = require("./db/waitForDb");
 const initializePassport = require("./passport-config");
@@ -28,7 +29,7 @@ app.set("views", __dirname + "/views");
 
 const expressLayouts = require("express-ejs-layouts");
 app.use(expressLayouts);
-app.set("layout", "layouts/layout", "layout/basic");
+app.set("layout", "layouts/layout");
 
 // Session, passport and flash must be initialized inside async setup
 async function initialize() {
@@ -36,8 +37,10 @@ async function initialize() {
         await waitForOracleDB();
         await initializeAdminUser();
         await initializeDb();
+        //await runMigrations('drop');
         await runMigrations();
-
+        await runSeeds();
+        
         app.use(
             session({
                 secret: "segredo",
@@ -57,11 +60,13 @@ async function initialize() {
         // Rotas
         const userRouter = require("./routes/users");
         const chatRouter = require("./routes/chat");
+        const postRouter = require("./routes/posts");
         app.use("/users", userRouter);
         app.use("/chat", chatRouter);
+        app.use("/posts", postRouter);
 
         app.get("/", (req, res) => {
-            res.render("index", { message: "PAGINA PRINCIPAL!" });
+            res.redirect("posts");
         });
 
         // Socket.io
@@ -72,13 +77,6 @@ async function initialize() {
                 socket.join(roomId);
                 console.log(`Socket ${socket.id} entrou na sala ${roomId}`);
 
-                try {
-                    const mensagensAntigas = await getMensagens(roomId);
-                    // Envia todas mensagens antigas pro usuário que acabou de entrar
-                    socket.emit("loadMessages", mensagensAntigas);
-                } catch (err) {
-                    console.error("Erro buscando mensagens antigas:", err);
-                }
             });
 
             socket.on("chatMessage", async ({ roomId, senderId, senderName, message }) => {

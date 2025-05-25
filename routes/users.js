@@ -2,6 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const fetch = require("node-fetch");
+const oracledb = require('oracledb');
 const router = express.Router();
 const { getOrCreateConversa } = require("../chat/chatService");
 
@@ -43,17 +44,6 @@ router.get("/login", async (req, res) => {
     res.render("users/login", { layout: "layouts/basic" });
 });
 
-router.get("/", async (req, res) => {
-    try {
-        const result = await req.db.execute("SELECT * FROM Usuario");
-        console.log("result: ", result);
-        res.render("index", { message: result.rows });
-    } catch (err) {
-        console.error("Error fetching users:", err);
-        res.status(500).send("Error fetching users");
-    }
-});
-
 router.get("/self", async (req, res) => {
     if (!req.isAuthenticated()) {
         res.redirect("/users/login");
@@ -70,32 +60,51 @@ router.post("/new", verificaRecaptcha, async (req, res) => {
         return res.redirect("/users/new");
     }
 
-    console.log("body: ", req.body);
+    //console.log("body: ", req.body);
     CPF = CPF.replace(/\D/g, ""); // Remove non-numeric characters from CPF
     password = await bcrypt.hash(password, 10);
     try {
-        await req.db.execute("INSERT INTO Usuario (Email, CPF, Nome, Senha) VALUES (:email, :CPF, :name, :password)", [
-            email,
-            CPF,
-            name,
-            password,
-        ]);
+        const result_auth = await req.db.execute(
+            `INSERT INTO Auth (username, hashed_pwd, status, role)
+             VALUES (:username, :hashed_pwd, :status, :role)
+             RETURNING id INTO :id`,
+            {
+                username: email,
+                hashed_pwd: password,
+                status: "ACTIVE",
+                role: "USER",
+                id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER } // Captura o ID
+            }
+        );
+          
+        const newId = result_auth.outBinds.id[0];
+        //console.log("ID gerado:", newId);
+          
+        await req.db.execute(
+            "INSERT INTO Users (auth_id, name, email, document_number) VALUES (:auth_id, :name, :email, :CPF)",
+            {
+                auth_id: newId,
+                name,
+                email,
+                CPF
+            }
+        ); // TODO: Outros campos
         await req.db.commit();
 
-        // Pega o usuário recém-criado para logar
-        const result = await req.db.execute("SELECT * FROM Usuario WHERE Email = :email", [email]);
+        // Fetch the newly created user for login
+        const result = await req.db.execute("SELECT * FROM Users WHERE email = :email", [email]);
 
         const user = result.rows[0];
         const userObj = {
-            id: user[0], // ID
-            email: user[1], // Email
-            nome: user[3], // Nome
+            id: user.ID,
+            email: user.EMAIL,
+            nome: user.NAME,
         };
 
         req.login(userObj, (err) => {
             if (err) return next(err);
             req.flash("success", "Usuário criado com sucesso!");
-            res.redirect("/users/dashboard");
+            res.redirect("/users/self");
         });
     } catch (error) {
         console.error("Error creating user:", error);
@@ -125,43 +134,86 @@ router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        const result = await req.db.execute("SELECT * FROM Usuario WHERE ID_Usuario = :userId", [userId]);
+        const result = await req.db.execute(
+            "SELECT * FROM Users WHERE id = :userId",
+            [userId],
+            { outFormat: oracledb.OBJECT }
+        );
         const user = result.rows[0];
+
 
         if (!user) {
             req.flash("error", "Usuário não encontrado.");
-            return res.redirect("/users");
+            return res.redirect("/");
         }
 
-        var dono = false;
-        if (req.isAuthenticated()) {
-            dono = req.user.id == userId;
-        }
-        const username = user[3];
+        const dono = req.isAuthenticated() && req.user.id == userId;
+        const username = user.NAME;
+        const description = user.BIO || "";
 
-        res.render("users/user", { username, userId, dono });
+        const postsResult = await req.db.execute(
+            `SELECT * FROM Posts WHERE user_id = :id ORDER BY last_seen DESC`,
+            [userId],
+            { outFormat: oracledb.OBJECT }
+        );
+        const posts = postsResult.rows;
+
+        res.render("users/user", {layout: "layouts/layout", username, userId, dono, description, posts });
     } catch (error) {
         console.error("Error fetching user:", error);
         req.flash("error", "Erro ao buscar usuário. Tente novamente.");
-        res.redirect("/users");
+        res.redirect("/");
     }
 });
+
 
 router.post("/:userId", checkAuthenticated, async (req, res) => {
     const user1Id = req.params.userId;
     const user2Id = req.user.id;
 
     try {
-        await getOrCreateConversa(user1Id, user2Id);
-
-        //req.flash("success", "Conversa criada com sucesso!");
-        res.redirect("/chat"); // TODO: Redirecionar pra conversa
+        const conversa = await getOrCreateConversa(user1Id, user2Id);
+        console.log("CONVERSA: ", conversa);
+        res.redirect("/chat/" + conversa);
     } catch (error) {
         console.error("Error creating conversation:", error);
         req.flash("error", "Erro ao criar conversa. Tente novamente.");
         res.redirect("/users/" + user1Id);
     }
 });
+
+
+
+
+router.post("/:userId/description", checkAuthenticated, async (req, res) => {
+    const userId = req.params.userId;
+    const novaDescricao = req.body.description;
+
+    console.log("new description:", novaDescricao);
+
+    try {
+        await req.db.execute(
+            `UPDATE Users SET bio = :bio WHERE id = :id`,
+            {
+                bio: { val: novaDescricao, type: oracledb.STRING },
+                id: userId
+            }
+        );
+
+        await req.db.commit();
+
+        req.flash("success", "Descrição atualizada.");
+    } catch (err) {
+        console.error("Erro ao salvar descrição:", err);
+        req.flash("error", "Erro ao atualizar descrição.");
+    }
+
+    res.redirect(`/users/${userId}`);
+});
+ 
+
+
+
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) return next();

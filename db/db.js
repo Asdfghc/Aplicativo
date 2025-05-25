@@ -1,12 +1,14 @@
-require("dotenv").config();
+// require("dotenv").config();
 const oracledb = require("oracledb");
+oracledb.outFormat = oracledb.OBJECT;
+oracledb.fetchAsString = [oracledb.CLOB];
 
 let pool;
 
 async function initializeDb() {
     try {
         pool = await oracledb.createPool({
-            user: process.env.DB_ADMIN_PASSWORD,
+            user: process.env.DB_ADMIN_USERNAME,
             password: process.env.DB_ADMIN_PASSWORD,
             connectString: process.env.DB_CONNECTION_STRING,
             poolMin: 2,

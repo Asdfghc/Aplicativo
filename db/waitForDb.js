@@ -7,7 +7,7 @@ const config = {
     connectString: process.env.DB_CONNECTION_STRING,
 };
 
-async function waitForOracleDB(maxRetries = 20, delay = 5000) {
+async function waitForOracleDB(maxRetries = 100, delay = 5000) {
     for (let i = 0; i < maxRetries; i++) {
         try {
             const connection = await oracledb.getConnection(config);
