@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("aaaa");
 
     const themeSwitch = document.getElementById('theme-switch');
     const htmlTag = document.documentElement;

@@ -80,7 +80,7 @@ router.post("/create", checkAuthenticated, upload.single("image"), async (req, r
         );
         await req.db.commit();
         req.flash("success", "Postagem criada com sucesso.");
-        res.redirect("/posts/create");
+        res.redirect("/"); 
     } catch (err) {
         console.error("Erro ao criar postagem:", err);
         req.flash("error", "Erro ao criar postagem: " + err.message);
