@@ -5,14 +5,27 @@
 
         <!-- Imagem -->
         <div class="w-full flex justify-center">
-            <img src="<%= "/uploads/" + post.IMAGE %>" alt="Imagem do animal" class="max-h-96 object-contain rounded-lg border border-gray-400">
+            <img src="<%= "/uploads/" + post.IMAGE %>" alt="Imagem do animal" class="max-h-96 object-contain rounded-lg border border-gray-400" />
         </div>
 
         <!-- Status -->
         <div class="text-center">
-            <span class="inline-block px-4 py-1 rounded-full text-white font-semibold bg-blue-500"> <%= post.LOST_OR_FOUND == "found" ? "Encontrado" : "Perdido" %> </span>
-            <!-- Ou -->
-            <!-- <span class="inline-block px-4 py-1 rounded-full text-white font-semibold bg-red-500">Perdido</span> -->
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full text-white
+                <%= post.LOST_OR_FOUND === 'found' ? 'bg-blue-500' : 'bg-red-500' %>">
+                <% if (post.LOST_OR_FOUND === "found") { %>
+                    <!-- Encontrado -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Encontrado
+                <% } else { %>
+                    <!-- Perdido -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.61-1.135.987-2.02L13.41 4.607a1.25 1.25 0 00-2.196 0L4.095 18.98c-.623.885-.067 2.02.987 2.02z" />
+                    </svg>
+                    Perdido
+                <% } %>
+            </span>
         </div>
 
         <!-- Descrição -->
