@@ -151,7 +151,14 @@ router.get("/:userId", async (req, res) => {
         const username = user.NAME;
         const description = user.BIO || "";
 
-        res.render("users/user", { username, userId, dono, description });
+        const postsResult = await req.db.execute(
+            `SELECT * FROM Posts WHERE user_id = :id ORDER BY last_seen DESC`,
+            [userId],
+            { outFormat: oracledb.OBJECT }
+        );
+        const posts = postsResult.rows;
+
+        res.render("users/user", {layout: "layouts/layout", username, userId, dono, description, posts });
     } catch (error) {
         console.error("Error fetching user:", error);
         req.flash("error", "Erro ao buscar usuário. Tente novamente.");
@@ -181,11 +188,6 @@ router.post("/:userId", checkAuthenticated, async (req, res) => {
 router.post("/:userId/description", checkAuthenticated, async (req, res) => {
     const userId = req.params.userId;
     const novaDescricao = req.body.description;
-
-    if (req.user.id != userId) {
-        req.flash("error", "Você não pode editar esse perfil.");
-        return res.redirect(`/users/${userId}`);
-    }
 
     console.log("new description:", novaDescricao);
 
